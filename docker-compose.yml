@@ -1,0 +1,46 @@
+# Sistema de Reservas UES FMO - PostgreSQL + pgAdmin
+# Uso:  docker compose up -d
+# Estructura esperada del repositorio:
+#   docker-compose.yml
+#   .env                      (copiar de .env.example; NO subir a GitHub)
+#   db/reservas_ues_fmo.sql   (el script de la base de datos)
+
+services:
+  db:
+    image: postgres:16
+    container_name: reservas_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      # Los .sql de esta carpeta se ejecutan SOLO la primera vez (cuando el volumen está vacío)
+      - ./db:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: reservas_pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
+    ports:
+      - "5050:80"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+
+volumes:
+  pgdata:
+  pgadmin_data:

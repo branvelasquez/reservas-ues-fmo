@@ -1,0 +1,157 @@
+
+<div class="dashboard-layout">
+
+  <app-sidebar
+    [items]="menuItems"
+    [activeModule]="activeModule()"
+    (moduleSelected)="selectModule($event)"
+    (closeDashboard)="closeDashboardPreview()">
+  </app-sidebar>
+
+  <section class="dashboard-main">
+
+    <app-topbar
+      [activeModule]="activeModule()"
+      [isDark]="isDark"
+      (toggleTheme)="toggleTheme()">
+    </app-topbar>
+
+    <main class="dashboard-content">
+
+      @if (activeModule() === 'Inicio') {
+
+        <div class="dashboard-welcome">
+          <div>
+            <span class="welcome-label">PANEL ADMINISTRATIVO</span>
+            <h1>¡Bienvenido al sistema!</h1>
+            <p>
+              Desde aquí podrás acceder a los módulos de gestión
+              de reservas de la Facultad.
+            </p>
+          </div>
+
+          <div class="welcome-icon">⌂</div>
+        </div>
+
+        <div class="section-heading">
+          <div>
+            <h2>Accesos principales</h2>
+            <p>Seleccioná el módulo con el que deseas trabajar.</p>
+          </div>
+        </div>
+
+        <div class="dashboard-cards">
+
+          <button
+            class="dashboard-card"
+            type="button"
+            (click)="selectModule('Solicitudes')">
+
+            <div class="card-icon blue">▤</div>
+            <h3>Solicitudes</h3>
+            <p>Registro y seguimiento de solicitudes de reserva.</p>
+            <span class="card-link">Ir al módulo →</span>
+          </button>
+
+          <button
+            class="dashboard-card"
+            type="button"
+            (click)="selectModule('Disponibilidad')">
+
+            <div class="card-icon green">◷</div>
+            <h3>Disponibilidad</h3>
+            <p>Consulta de espacios y horarios disponibles.</p>
+            <span class="card-link">Ir al módulo →</span>
+          </button>
+
+          <button
+            class="dashboard-card"
+            type="button"
+            (click)="selectModule('Calendario')">
+
+            <div class="card-icon purple">▦</div>
+            <h3>Calendario</h3>
+            <p>Visualización de reservas por día, semana y espacio.</p>
+            <span class="card-link">Ir al módulo →</span>
+          </button>
+
+          <button
+            class="dashboard-card"
+            type="button"
+            (click)="selectModule('Espacios')">
+
+            <div class="card-icon orange">▣</div>
+            <h3>Espacios</h3>
+            <p>Consulta de laboratorios y aulas de cómputo.</p>
+            <span class="card-link">Ir al módulo →</span>
+          </button>
+
+        </div>
+
+        <section class="dashboard-info">
+
+          <div class="info-heading">
+            <div>
+              <h2>Información del sistema</h2>
+              <p>Aspectos generales de la plataforma.</p>
+            </div>
+
+            <span class="info-symbol">i</span>
+          </div>
+
+          <div class="info-grid">
+
+            <div>
+              <span class="info-number">08</span>
+              <strong>Espacios identificados</strong>
+              <small>Inventario provisional de la FMO</small>
+            </div>
+
+            <div>
+              <span class="info-number">03</span>
+              <strong>Materias participantes</strong>
+              <small>PPI, Base de Datos 2 e INR</small>
+            </div>
+
+          </div>
+        </section>
+
+      } @else if (activeModule() === 'Solicitudes') {
+
+        <app-solicitudes></app-solicitudes>
+
+      } @else {
+
+        <div class="module-placeholder">
+
+          <div class="module-placeholder-icon">▣</div>
+
+          <span class="welcome-label">MÓDULO DEL SISTEMA</span>
+
+          <h1>{{ activeModule() }}</h1>
+
+          <p>
+            Esta sección forma parte de la estructura del sistema.
+            Próximamente desarrollaremos sus funciones y conectaremos
+            la información con nuestra API y base de datos.
+          </p>
+
+          <button
+            class="login-button"
+            type="button"
+            (click)="selectModule('Inicio')">
+
+            Volver al inicio <span>→</span>
+          </button>
+
+        </div>
+
+      }
+
+      <footer class="dashboard-footer">
+        Sistema de Reserva de Laboratorios y Aulas de Cómputo · UES FMO
+      </footer>
+
+    </main>
+  </section>
+</div>

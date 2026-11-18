@@ -1,0 +1,103 @@
+
+<div class="login-container">
+  <section class="brand-section">
+    <div class="brand-content">
+      <div class="logo-placeholder">
+        <span>UES</span>
+      </div>
+
+      <p class="institution-name">
+        UNIVERSIDAD DE EL SALVADOR
+      </p>
+
+      <p class="faculty-name">
+        FACULTAD MULTIDISCIPLINARIA ORIENTAL
+      </p>
+
+      <div class="brand-divider"></div>
+
+      <h1>Sistema de Reserva de Laboratorios y Aulas de Cómputo</h1>
+
+      <p class="brand-description">
+        Plataforma institucional para la gestión y administración de
+        solicitudes de reserva de espacios académicos.
+      </p>
+
+      <div class="project-tags">
+        <span>PPI</span>
+        <span>BD2</span>
+        <span>INR</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="form-section">
+    <div class="form-wrapper">
+      <div class="form-heading">
+        <span class="form-eyebrow">ACCESO A LA PLATAFORMA</span>
+        <h2>Solicitar acceso</h2>
+        <p>Completá tus datos para solicitar autorización de ingreso.</p>
+      </div>
+
+      <form (submit)="onRequestAccess($event)">
+        <div class="form-group">
+          <label for="fullName">Nombre completo</label>
+          <input
+            id="fullName"
+            type="text"
+            placeholder="Ingresá tu nombre completo"
+            autocomplete="name"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="institutionalEmail">Correo institucional</label>
+          <input
+            id="institutionalEmail"
+            type="email"
+            placeholder="ejemplo@ues.edu.sv"
+            autocomplete="email"
+            required
+          />
+        </div>
+
+        <div class="access-notice">
+          <strong>Importante</strong>
+          <p>
+            El acceso a la plataforma requiere autorización.
+            Los permisos se asignarán de acuerdo con las responsabilidades
+            autorizadas dentro del sistema.
+          </p>
+        </div>
+
+        <button type="submit" class="login-button">
+          Enviar solicitud
+        </button>
+      </form>
+
+      @if (message()) {
+        <div class="form-message">
+          {{ message() }}
+        </div>
+      }
+
+      <div class="access-section">
+        <p>¿Ya tenés una cuenta?</p>
+
+        <button
+          type="button"
+          class="access-button"
+          (click)="showLogin()"
+        >
+          Volver al inicio de sesión
+        </button>
+      </div>
+
+      <div class="form-footer">
+        <span>Universidad de El Salvador</span>
+        <span>Facultad Multidisciplinaria Oriental</span>
+      </div>
+    </div>
+  </section>
+</div>

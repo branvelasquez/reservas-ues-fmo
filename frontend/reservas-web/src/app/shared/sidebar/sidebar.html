@@ -1,0 +1,59 @@
+
+<aside class="sidebar">
+
+  <div class="sidebar-brand">
+    <div class="sidebar-logo">UES</div>
+
+    <div class="sidebar-brand-text">
+      <strong>UES FMO</strong>
+      <span>Sistema de Reservas</span>
+    </div>
+  </div>
+
+  <div class="sidebar-divider"></div>
+
+  <div class="sidebar-section-label">
+    MENÚ PRINCIPAL
+  </div>
+
+  <nav class="sidebar-nav">
+    @for (item of items; track item.name) {
+      <button
+        type="button"
+        class="sidebar-link"
+        [class.active]="activeModule === item.name"
+        (click)="selectModule(item.name)"
+      >
+        <span class="sidebar-link-icon">{{ item.icon }}</span>
+        <span class="sidebar-link-text">{{ item.name }}</span>
+
+        @if (activeModule === item.name) {
+          <span class="sidebar-active-indicator"></span>
+        }
+      </button>
+    }
+  </nav>
+
+  <div class="sidebar-bottom">
+    <div class="sidebar-divider"></div>
+
+    <div class="sidebar-user">
+      <div class="sidebar-user-avatar">U</div>
+
+      <div class="sidebar-user-info">
+        <strong>Vista de demostración</strong>
+        <span>Usuario de prueba</span>
+      </div>
+    </div>
+
+    <button
+      type="button"
+      class="sidebar-exit"
+      (click)="exitDashboard()"
+    >
+      <span class="sidebar-exit-icon">↪</span>
+      <span>Salir del panel</span>
+    </button>
+  </div>
+
+</aside>

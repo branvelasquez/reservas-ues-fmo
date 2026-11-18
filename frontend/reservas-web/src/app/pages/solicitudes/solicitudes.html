@@ -1,0 +1,268 @@
+
+<section class="solicitudes-page">
+
+  <header class="module-header">
+    <div>
+      <span class="module-eyebrow">GESTIÓN ACADÉMICA</span>
+      <h1>Solicitudes de reserva</h1>
+      <p>
+        Registro y seguimiento de solicitudes para laboratorios
+        y aulas de cómputo de la FMO.
+      </p>
+    </div>
+
+    <button
+      type="button"
+      class="new-request-button"
+      (click)="abrirFormulario()">
+      <span>＋</span>
+      Nueva solicitud
+    </button>
+  </header>
+
+  <section class="request-summary">
+
+    <article class="summary-card">
+      <div class="summary-icon blue">▤</div>
+      <div>
+        <span>Total de solicitudes</span>
+        <strong>—</strong>
+        <small>Sin registros todavía</small>
+      </div>
+    </article>
+
+    <article class="summary-card">
+      <div class="summary-icon orange">◷</div>
+      <div>
+        <span>Pendientes de revisión</span>
+        <strong>—</strong>
+        <small>Sin registros todavía</small>
+      </div>
+    </article>
+
+    <article class="summary-card">
+      <div class="summary-icon green">✓</div>
+      <div>
+        <span>Aprobadas</span>
+        <strong>—</strong>
+        <small>Sin registros todavía</small>
+      </div>
+    </article>
+
+    <article class="summary-card">
+      <div class="summary-icon red">✕</div>
+      <div>
+        <span>Rechazadas</span>
+        <strong>—</strong>
+        <small>Sin registros todavía</small>
+      </div>
+    </article>
+
+  </section>
+
+  <section class="requests-panel">
+
+    <div class="requests-panel-header">
+      <div>
+        <h2>Listado de solicitudes</h2>
+        <p>Consultá y revisá las solicitudes registradas.</p>
+      </div>
+    </div>
+
+    <div class="requests-filters">
+
+      <div class="search-field">
+        <span>⌕</span>
+        <input
+          type="search"
+          placeholder="Buscar solicitud..."
+          [value]="busqueda()"
+          (input)="actualizarBusqueda($any($event.target).value)">
+      </div>
+
+      <select
+        [value]="estadoFiltro()"
+        (change)="actualizarEstado($any($event.target).value)">
+        @for (estado of estados; track estado) {
+          <option [value]="estado">{{ estado }}</option>
+        }
+      </select>
+
+    </div>
+
+    <div class="requests-table-wrapper">
+      <table class="requests-table">
+        <thead>
+          <tr>
+            <th>Solicitud</th>
+            <th>Espacio</th>
+            <th>Fecha</th>
+            <th>Horario</th>
+            <th>Solicitante</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          @if (solicitudes.length === 0) {
+            <tr>
+              <td colspan="7">
+                <div class="empty-state">
+                  <div class="empty-icon">▤</div>
+                  <h3>No hay solicitudes registradas</h3>
+                  <p>
+                    Cuando se registren solicitudes,
+                    aparecerán en este listado.
+                  </p>
+                  <button
+                    type="button"
+                    class="empty-action"
+                    (click)="abrirFormulario()">
+                    Registrar primera solicitud
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+  </section>
+
+  @if (mostrarFormulario()) {
+    <div class="modal-overlay" (click)="cerrarFormulario()">
+
+      <section
+        class="request-modal"
+        (click)="$event.stopPropagation()">
+
+        <header class="modal-header">
+          <div>
+            <span class="module-eyebrow">NUEVO REGISTRO</span>
+            <h2>Nueva solicitud de reserva</h2>
+            <p>Completá la información de la actividad académica.</p>
+          </div>
+
+          <button
+            type="button"
+            class="modal-close"
+            (click)="cerrarFormulario()">
+            ×
+          </button>
+        </header>
+
+        <form class="request-form">
+
+          <div class="form-grid">
+
+            <div class="field-group full-width">
+              <label for="space">Espacio solicitado</label>
+              <select id="space" required>
+                <option value="">Seleccionar espacio</option>
+                <option>Laboratorio de Física</option>
+                <option>Laboratorio de Química</option>
+                <option>Laboratorio de Industrial</option>
+                <option>Laboratorio de Biología</option>
+                <option>Laboratorio de Realidad Virtual</option>
+                <option>Aula de cómputo A</option>
+                <option>Aula de cómputo B</option>
+                <option>Aula de cómputo C</option>
+              </select>
+            </div>
+
+            <div class="field-group">
+              <label for="date">Fecha</label>
+              <input id="date" type="date" required>
+            </div>
+
+            <div class="field-group">
+              <label for="activity">Tipo de actividad</label>
+              <input
+                id="activity"
+                type="text"
+                placeholder="Tipo de actividad"
+                required>
+            </div>
+
+            <div class="field-group">
+              <label for="startTime">Hora de inicio</label>
+              <input id="startTime" type="time" required>
+            </div>
+
+            <div class="field-group">
+              <label for="endTime">Hora de finalización</label>
+              <input id="endTime" type="time" required>
+            </div>
+
+            <div class="field-group">
+              <label for="subject">Asignatura</label>
+              <input
+                id="subject"
+                type="text"
+                placeholder="Nombre de la asignatura"
+                required>
+            </div>
+
+            <div class="field-group">
+              <label for="group">Grupo</label>
+              <input
+                id="group"
+                type="text"
+                placeholder="Identificación del grupo"
+                required>
+            </div>
+
+            <div class="field-group">
+              <label for="students">Cantidad de estudiantes</label>
+              <input
+                id="students"
+                type="number"
+                min="1"
+                placeholder="Cantidad"
+                required>
+            </div>
+
+            <div class="field-group full-width">
+              <label for="resources">Software o recursos requeridos</label>
+              <textarea
+                id="resources"
+                rows="3"
+                placeholder="Describí el software o los recursos que necesitás..."></textarea>
+            </div>
+
+          </div>
+
+          <div class="form-notice">
+            <strong>Importante</strong>
+            <p>
+              El registro estará sujeto a las validaciones de disponibilidad
+              y a la revisión correspondiente.
+            </p>
+          </div>
+
+          <footer class="modal-actions">
+            <button
+              type="button"
+              class="cancel-button"
+              (click)="cerrarFormulario()">
+              Cancelar
+            </button>
+
+            <button type="button" class="submit-request-button" disabled>
+              Registrar solicitud
+            </button>
+          </footer>
+
+          <p class="form-development-note">
+            El registro real se habilitará al conectar el backend.
+          </p>
+
+        </form>
+
+      </section>
+    </div>
+  }
+
+</section>

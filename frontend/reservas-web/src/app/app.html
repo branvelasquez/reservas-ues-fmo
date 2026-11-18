@@ -1,0 +1,41 @@
+
+<div class="app-shell" [class.dark-theme]="isDark()">
+
+  <!-- Botón de tema para las pantallas de acceso -->
+  @if (currentView() !== 'dashboard') {
+    <button
+      type="button"
+      class="theme-toggle login-theme-toggle"
+      (click)="toggleTheme()"
+      [attr.aria-label]="isDark() ? 'Activar tema claro' : 'Activar tema oscuro'"
+      [title]="isDark() ? 'Activar tema claro' : 'Activar tema oscuro'"
+    >
+      {{ isDark() ? '☀' : '☾' }}
+    </button>
+  }
+
+  <!-- Inicio de sesión -->
+  @if (currentView() === 'login') {
+    <app-login
+      (requestAccess)="showAccessRequest()"
+      (previewDashboard)="openDashboardPreview()">
+    </app-login>
+  }
+
+  <!-- Solicitud de acceso -->
+  @if (currentView() === 'request') {
+    <app-access-request
+      (backToLogin)="showLogin()">
+    </app-access-request>
+  }
+
+  <!-- Panel administrativo -->
+  @if (currentView() === 'dashboard') {
+    <app-dashboard
+      [isDark]="isDark()"
+      (toggleThemeEvent)="toggleTheme()"
+      (closeDashboard)="closeDashboardPreview()">
+    </app-dashboard>
+  }
+
+</div>
