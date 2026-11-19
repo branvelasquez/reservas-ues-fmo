@@ -1,0 +1,622 @@
+<div class="horarios-page">
+
+  @if (!espacioSeleccionado()) {
+    <section class="module-header">
+      <div>
+        <span class="section-eyebrow">GESTIÓN ACADÉMICA</span>
+        <h1>Horarios institucionales</h1>
+        <p>
+          Seleccioná un laboratorio o aula de cómputo para administrar
+          sus horarios institucionales.
+        </p>
+      </div>
+
+      <span class="provisional-badge">
+        <span class="status-dot"></span>
+        Inventario provisional
+      </span>
+    </section>
+
+    <section class="schedule-summary">
+      <article class="summary-card">
+        <div class="summary-icon blue-icon">▣</div>
+        <div>
+          <span>Espacios registrados</span>
+          <strong>{{ espacios.length }}</strong>
+        </div>
+      </article>
+
+      <article class="summary-card">
+        <div class="summary-icon gold-icon">◷</div>
+        <div>
+          <span>Horarios registrados</span>
+          <strong>{{ totalHorarios() }}</strong>
+        </div>
+      </article>
+
+      <article class="summary-card">
+        <div class="summary-icon orange-icon">▤</div>
+        <div>
+          <span>Solicitudes pendientes</span>
+          <strong>{{ totalSolicitudesPendientes() }}</strong>
+        </div>
+      </article>
+    </section>
+
+    <div class="catalog-heading">
+      <div>
+        <h2>Seleccionar espacio</h2>
+        <p>Ingresá al espacio que necesitás administrar.</p>
+      </div>
+      <span class="catalog-count">{{ espacios.length }} espacios</span>
+    </div>
+
+    <section class="spaces-grid">
+      @for (espacio of espacios; track espacio.id) {
+        <button
+          type="button"
+          class="space-card"
+          (click)="abrirEspacio(espacio)">
+
+          <div class="space-card-top">
+            <span class="space-icon">
+              {{ espacio.tipo === 'Laboratorio' ? '⚗' : '▣' }}
+            </span>
+            <span class="space-code">{{ espacio.codigo }}</span>
+          </div>
+
+          <div class="space-card-content">
+            <span class="space-type">{{ espacio.tipo }}</span>
+            <h3>{{ espacio.nombre }}</h3>
+            <p class="space-location">
+              <span>⌖</span>
+              {{ espacio.ubicacion }}
+            </p>
+          </div>
+
+          <div class="space-card-footer">
+            <div class="space-stat">
+              <strong>{{ horariosPorEspacio(espacio.id) }}</strong>
+              <span>Horarios</span>
+            </div>
+
+            <div class="space-stat">
+              <strong>{{ pendientesPorEspacio(espacio.id) }}</strong>
+              <span>Pendientes</span>
+            </div>
+
+            <span class="space-open">Abrir espacio →</span>
+          </div>
+        </button>
+      }
+    </section>
+
+    <div class="catalog-note">
+      <span class="note-icon">i</span>
+      <p>
+        Los horarios se administran individualmente por espacio.
+        La información mostrada corresponde a esta demostración y todavía
+        no está conectada a la base de datos institucional.
+      </p>
+    </div>
+  }
+
+  @if (espacioSeleccionado(); as espacio) {
+    <section class="module-header detail-header">
+      <div>
+        <button
+          type="button"
+          class="back-button"
+          (click)="volverAlCatalogo()">
+          ← Volver a espacios
+        </button>
+
+        <span class="section-eyebrow">{{ espacio.codigo }}</span>
+        <h1>{{ espacio.nombre }}</h1>
+        <p>
+          Administración individual de horarios y solicitudes de modificación.
+        </p>
+      </div>
+
+      <span class="provisional-badge">
+        <span class="status-dot"></span>
+        Módulo de espacio
+      </span>
+    </section>
+
+    <section class="space-detail-card">
+      <div class="detail-space-icon">
+        {{ espacio.tipo === 'Laboratorio' ? '⚗' : '▣' }}
+      </div>
+
+      <div class="detail-space-info">
+        <span>{{ espacio.tipo }}</span>
+        <strong>{{ espacio.nombre }}</strong>
+        <small>{{ espacio.ubicacion }}</small>
+      </div>
+
+      <div class="detail-responsible">
+        <span>Responsable de gestión</span>
+        <strong>{{ espacio.encargado }}</strong>
+      </div>
+    </section>
+
+    <section class="schedule-summary detail-summary">
+      <article class="summary-card">
+        <div class="summary-icon blue-icon">◷</div>
+        <div>
+          <span>Horarios de este espacio</span>
+          <strong>{{ horariosDelEspacio().length }}</strong>
+        </div>
+      </article>
+
+      <article class="summary-card">
+        <div class="summary-icon orange-icon">▤</div>
+        <div>
+          <span>Solicitudes pendientes</span>
+          <strong>
+            {{ solicitudesDelEspacio().filter(s => s.estado === 'Pendiente de revisión').length }}
+          </strong>
+        </div>
+      </article>
+
+      <article class="summary-card">
+        <div class="summary-icon gold-icon">▥</div>
+        <div>
+          <span>Movimientos registrados</span>
+          <strong>{{ historialDelEspacio().length }}</strong>
+        </div>
+      </article>
+    </section>
+
+    <nav class="schedule-tabs">
+      <button
+        type="button"
+        [class.active]="vistaActiva() === 'horarios'"
+        (click)="cambiarVista('horarios')">
+        <span>◷</span>
+        Horarios
+        <span class="tab-count">{{ horariosDelEspacio().length }}</span>
+      </button>
+
+      <button
+        type="button"
+        [class.active]="vistaActiva() === 'solicitudes'"
+        (click)="cambiarVista('solicitudes')">
+        <span>▤</span>
+        Solicitudes
+        <span class="tab-count">{{ solicitudesDelEspacio().length }}</span>
+      </button>
+
+      <button
+        type="button"
+        [class.active]="vistaActiva() === 'historial'"
+        (click)="cambiarVista('historial')">
+        <span>▥</span>
+        Historial
+        <span class="tab-count">{{ historialDelEspacio().length }}</span>
+      </button>
+    </nav>
+
+    @if (vistaActiva() === 'horarios') {
+      <section class="schedule-section">
+        <div class="section-toolbar">
+          <div>
+            <h2>Horarios registrados</h2>
+            <p>Programación institucional correspondiente a este espacio.</p>
+          </div>
+
+          <button
+            type="button"
+            class="primary-button"
+            (click)="abrirFormularioHorario()">
+            + Registrar horario
+          </button>
+        </div>
+
+        @if (horariosDelEspacio().length > 0) {
+          <div class="table-wrapper">
+            <table class="schedule-table">
+              <thead>
+                <tr>
+                  <th>Asignatura</th>
+                  <th>Grupo</th>
+                  <th>Docente</th>
+                  <th>Día</th>
+                  <th>Horario</th>
+                  <th>Período</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                @for (horario of horariosDelEspacio(); track horario.id) {
+                  <tr>
+                    <td class="subject-cell">{{ horario.asignatura }}</td>
+                    <td>{{ horario.grupo || 'No indicado' }}</td>
+                    <td>{{ horario.docente }}</td>
+                    <td>{{ horario.dia }}</td>
+                    <td class="time-cell">
+                      {{ horario.horaInicio }} - {{ horario.horaFin }}
+                    </td>
+                    <td>{{ horario.periodo }}</td>
+                    <td>
+                      <button
+                        type="button"
+                        class="table-action"
+                        (click)="abrirFormularioSolicitud(horario)">
+                        Solicitar cambio
+                      </button>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        } @else {
+          <div class="empty-state">
+            <div class="empty-icon">◷</div>
+            <h3>Aún no hay horarios registrados</h3>
+            <p>
+              Cuando se reciban los horarios asignados por Académica,
+              el responsable podrá registrarlos en este espacio.
+            </p>
+            <button
+              type="button"
+              class="primary-button"
+              (click)="abrirFormularioHorario()">
+              Registrar primer horario
+            </button>
+          </div>
+        }
+      </section>
+    }
+
+    @if (vistaActiva() === 'solicitudes') {
+      <section class="schedule-section">
+        <div class="section-toolbar">
+          <div>
+            <h2>Solicitudes de modificación</h2>
+            <p>Revisá las solicitudes enviadas por los docentes para este espacio.</p>
+          </div>
+        </div>
+
+        @if (solicitudesDelEspacio().length > 0) {
+          <div class="requests-list">
+            @for (solicitud of solicitudesDelEspacio(); track solicitud.id) {
+              <article class="request-card">
+                <div class="request-card-header">
+                  <div>
+                    <span class="request-number">SOL-{{ solicitud.id }}</span>
+                    <h3>{{ solicitud.docente }}</h3>
+                    <p>Solicitud recibida: {{ solicitud.fechaSolicitud }}</p>
+                  </div>
+
+                  <span
+                    class="request-status"
+                    [class.pending]="solicitud.estado === 'Pendiente de revisión'"
+                    [class.approved]="solicitud.estado === 'Aprobada'"
+                    [class.rejected]="solicitud.estado === 'Rechazada'">
+                    {{ solicitud.estado }}
+                  </span>
+                </div>
+
+                <div class="request-comparison">
+                  <div>
+                    <span class="comparison-label">Horario actual</span>
+                    <strong>{{ solicitud.diaActual }}</strong>
+                    <p>
+                      {{ solicitud.horaInicioActual }} -
+                      {{ solicitud.horaFinActual }}
+                    </p>
+                  </div>
+
+                  <div class="comparison-arrow">→</div>
+
+                  <div>
+                    <span class="comparison-label">Horario solicitado</span>
+                    <strong>{{ solicitud.diaSolicitado }}</strong>
+                    <p>
+                      {{ solicitud.horaInicioSolicitada }} -
+                      {{ solicitud.horaFinSolicitada }}
+                    </p>
+                  </div>
+                </div>
+
+                <div class="request-reason">
+                  <strong>Motivo de la solicitud</strong>
+                  <p>{{ solicitud.motivo }}</p>
+                </div>
+
+                @if (solicitud.estado === 'Pendiente de revisión') {
+                  <div class="request-actions">
+                    <button
+                      type="button"
+                      class="reject-button"
+                      (click)="rechazarSolicitud(solicitud)">
+                      Rechazar
+                    </button>
+
+                    <button
+                      type="button"
+                      class="approve-button"
+                      (click)="aprobarSolicitud(solicitud)">
+                      Aprobar modificación
+                    </button>
+                  </div>
+                }
+              </article>
+            }
+          </div>
+        } @else {
+          <div class="empty-state">
+            <div class="empty-icon">▤</div>
+            <h3>No hay solicitudes todavía</h3>
+            <p>
+              Las solicitudes de modificación relacionadas con este espacio
+              aparecerán aquí.
+            </p>
+          </div>
+        }
+      </section>
+    }
+
+    @if (vistaActiva() === 'historial') {
+      <section class="schedule-section">
+        <div class="section-toolbar">
+          <div>
+            <h2>Historial de movimientos</h2>
+            <p>Registro de las operaciones realizadas en este espacio.</p>
+          </div>
+        </div>
+
+        @if (historialDelEspacio().length > 0) {
+          <div class="history-list">
+            @for (movimiento of historialDelEspacio(); track movimiento.id) {
+              <article class="history-item">
+                <div class="history-marker"></div>
+
+                <div class="history-content">
+                  <div class="history-heading">
+                    <strong>{{ movimiento.descripcion }}</strong>
+                    <span>{{ movimiento.fecha }}</span>
+                  </div>
+
+                  <p>{{ movimiento.detalle }}</p>
+                  <small>Responsable: {{ movimiento.responsable }}</small>
+                </div>
+              </article>
+            }
+          </div>
+        } @else {
+          <div class="empty-state">
+            <div class="empty-icon">▥</div>
+            <h3>Sin movimientos registrados</h3>
+            <p>
+              Las operaciones realizadas en este espacio se mostrarán
+              en esta sección.
+            </p>
+          </div>
+        }
+      </section>
+    }
+
+    @if (mostrarFormularioHorario()) {
+      <div class="modal-overlay" (click)="cerrarFormularioHorario()">
+        <section
+          class="schedule-modal"
+          (click)="$event.stopPropagation()">
+
+          <div class="modal-header">
+            <div>
+              <span class="section-eyebrow">NUEVO REGISTRO</span>
+              <h2>Registrar horario</h2>
+              <p>{{ espacio.nombre }}</p>
+            </div>
+
+            <button
+              type="button"
+              class="modal-close"
+              (click)="cerrarFormularioHorario()">
+              ×
+            </button>
+          </div>
+
+          <form (ngSubmit)="registrarHorario($event)">
+            <div class="form-grid">
+              <label class="full-field">
+                Asignatura
+                <input
+                  type="text"
+                  name="asignatura"
+                  [(ngModel)]="nuevoHorario.asignatura"
+                  placeholder="Nombre de la asignatura"
+                  required>
+              </label>
+
+              <label>
+                Grupo
+                <input
+                  type="text"
+                  name="grupo"
+                  [(ngModel)]="nuevoHorario.grupo"
+                  placeholder="Ej. Grupo 01">
+              </label>
+
+              <label>
+                Docente
+                <input
+                  type="text"
+                  name="docente"
+                  [(ngModel)]="nuevoHorario.docente"
+                  placeholder="Nombre del docente"
+                  required>
+              </label>
+
+              <label>
+                Día
+                <select name="dia" [(ngModel)]="nuevoHorario.dia">
+                  @for (dia of dias; track dia) {
+                    <option [value]="dia">{{ dia }}</option>
+                  }
+                </select>
+              </label>
+
+              <label>
+                Período académico
+                <input
+                  type="text"
+                  name="periodo"
+                  [(ngModel)]="nuevoHorario.periodo"
+                  placeholder="Ej. Ciclo II - 2026"
+                  required>
+              </label>
+
+              <label>
+                Hora de inicio
+                <input
+                  type="time"
+                  name="horaInicio"
+                  [(ngModel)]="nuevoHorario.horaInicio"
+                  required>
+              </label>
+
+              <label>
+                Hora de finalización
+                <input
+                  type="time"
+                  name="horaFin"
+                  [(ngModel)]="nuevoHorario.horaFin"
+                  required>
+              </label>
+            </div>
+
+            <p class="form-note">
+              El horario se registrará únicamente dentro de este espacio.
+              Esta demostración todavía no valida cruces con otros horarios.
+            </p>
+
+            <div class="modal-actions">
+              <button
+                type="button"
+                class="secondary-button"
+                (click)="cerrarFormularioHorario()">
+                Cancelar
+              </button>
+
+              <button type="submit" class="primary-button">
+                Guardar horario
+              </button>
+            </div>
+          </form>
+        </section>
+      </div>
+    }
+
+    @if (mostrarFormularioSolicitud()) {
+      <div class="modal-overlay" (click)="cerrarFormularioSolicitud()">
+        <section
+          class="schedule-modal"
+          (click)="$event.stopPropagation()">
+
+          <div class="modal-header">
+            <div>
+              <span class="section-eyebrow">SOLICITUD DOCENTE</span>
+              <h2>Solicitar modificación</h2>
+              <p>{{ espacio.nombre }}</p>
+            </div>
+
+            <button
+              type="button"
+              class="modal-close"
+              (click)="cerrarFormularioSolicitud()">
+              ×
+            </button>
+          </div>
+
+          @if (horarioSeleccionado(); as horario) {
+            <div class="current-schedule">
+              <span>Horario institucional actual</span>
+              <strong>{{ horario.asignatura }}</strong>
+              <p>
+                {{ horario.dia }} ·
+                {{ horario.horaInicio }} - {{ horario.horaFin }}
+              </p>
+            </div>
+          }
+
+          <form (ngSubmit)="registrarSolicitud($event)">
+            <div class="form-grid">
+              <label class="full-field">
+                Nombre del docente solicitante
+                <input
+                  type="text"
+                  name="docenteSolicitud"
+                  [(ngModel)]="solicitudCambio.docente"
+                  required>
+              </label>
+
+              <label>
+                Nuevo día solicitado
+                <select
+                  name="diaSolicitado"
+                  [(ngModel)]="solicitudCambio.diaSolicitado">
+                  @for (dia of dias; track dia) {
+                    <option [value]="dia">{{ dia }}</option>
+                  }
+                </select>
+              </label>
+
+              <label>
+                Nueva hora de inicio
+                <input
+                  type="time"
+                  name="horaInicioSolicitada"
+                  [(ngModel)]="solicitudCambio.horaInicioSolicitada"
+                  required>
+              </label>
+
+              <label>
+                Nueva hora de finalización
+                <input
+                  type="time"
+                  name="horaFinSolicitada"
+                  [(ngModel)]="solicitudCambio.horaFinSolicitada"
+                  required>
+              </label>
+
+              <label class="full-field">
+                Motivo de la modificación
+                <textarea
+                  name="motivo"
+                  [(ngModel)]="solicitudCambio.motivo"
+                  rows="3"
+                  placeholder="Explicá por qué necesitás modificar el horario..."
+                  required></textarea>
+              </label>
+            </div>
+
+            <p class="form-note">
+              La solicitud quedará pendiente de revisión. El horario actual
+              no cambiará hasta que el responsable apruebe la modificación.
+            </p>
+
+            <div class="modal-actions">
+              <button
+                type="button"
+                class="secondary-button"
+                (click)="cerrarFormularioSolicitud()">
+                Cancelar
+              </button>
+
+              <button type="submit" class="primary-button">
+                Enviar solicitud
+              </button>
+            </div>
+          </form>
+        </section>
+      </div>
+    }
+  }
+
+</div>

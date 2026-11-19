@@ -1,0 +1,177 @@
+
+<section class="espacios-page">
+
+  <div class="module-header">
+    <div>
+      <span class="module-eyebrow">ADMINISTRACIÓN</span>
+      <h1>Espacios académicos</h1>
+      <p>
+        Consulta el inventario de laboratorios y aulas de cómputo
+        disponibles en la Facultad.
+      </p>
+    </div>
+
+    <div class="inventory-badge">
+      <span class="inventory-dot"></span>
+      Inventario provisional
+    </div>
+  </div>
+
+  <!-- Resumen -->
+  <div class="espacios-summary">
+
+    <article class="summary-card">
+      <div class="summary-icon blue-icon">▣</div>
+      <div>
+        <span class="summary-label">Total de espacios</span>
+        <strong>{{ espacios.length }}</strong>
+        <small>Espacios identificados</small>
+      </div>
+    </article>
+
+    <article class="summary-card">
+      <div class="summary-icon purple-icon">⌂</div>
+      <div>
+        <span class="summary-label">Laboratorios</span>
+        <strong>{{ totalLaboratorios() }}</strong>
+        <small>Áreas de laboratorio</small>
+      </div>
+    </article>
+
+    <article class="summary-card">
+      <div class="summary-icon gold-icon">▦</div>
+      <div>
+        <span class="summary-label">Aulas de cómputo</span>
+        <strong>{{ totalAulas() }}</strong>
+        <small>Ubicadas en Biblioteca</small>
+      </div>
+    </article>
+
+  </div>
+
+  <!-- Filtros -->
+  <div class="espacios-toolbar">
+
+    <div class="toolbar-heading">
+      <h2>Catálogo de espacios</h2>
+      <span>{{ espaciosFiltrados().length }} resultados</span>
+    </div>
+
+    <div class="espacios-filters">
+
+      <div class="search-field">
+        <span>⌕</span>
+        <input
+          type="text"
+          placeholder="Buscar espacio..."
+          [value]="busqueda()"
+          (input)="actualizarBusqueda($any($event.target).value)"
+        />
+      </div>
+
+      <select
+        [value]="filtroTipo()"
+        (change)="actualizarFiltro($any($event.target).value)"
+      >
+        <option value="Todos">Todos los tipos</option>
+        <option value="Laboratorio">Laboratorios</option>
+        <option value="Aula de cómputo">Aulas de cómputo</option>
+      </select>
+
+      <button
+        type="button"
+        class="clear-filter-btn"
+        (click)="limpiarFiltros()"
+      >
+        Limpiar
+      </button>
+
+    </div>
+  </div>
+
+  <!-- Tarjetas -->
+  <div class="espacios-grid">
+
+    @for (espacio of espaciosFiltrados(); track espacio.id) {
+
+      <article class="espacio-card">
+
+        <div class="espacio-card-top">
+          <div
+            class="espacio-icon"
+            [class.lab-icon]="espacio.tipo === 'Laboratorio'"
+            [class.classroom-icon]="espacio.tipo === 'Aula de cómputo'"
+          >
+            {{ espacio.tipo === 'Laboratorio' ? '⌂' : '▦' }}
+          </div>
+
+          <span class="space-id">
+            ESP-{{ espacio.id.toString().padStart(3, '0') }}
+          </span>
+        </div>
+
+        <div class="espacio-main-info">
+          <span class="espacio-type">{{ espacio.tipo }}</span>
+          <h3>{{ espacio.nombre }}</h3>
+        </div>
+
+        <div class="espacio-details">
+
+          <div class="detail-row">
+            <span class="detail-icon">⌖</span>
+            <div>
+              <small>Ubicación</small>
+              <strong>{{ espacio.ubicacion }}</strong>
+            </div>
+          </div>
+
+          <div class="detail-row">
+            <span class="detail-icon">♙</span>
+            <div>
+              <small>Responsable / gestión</small>
+              <strong>{{ espacio.encargado }}</strong>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="espacio-card-footer">
+          <span class="identified-status">
+            <span></span>
+            {{ espacio.estado }}
+          </span>
+        </div>
+
+      </article>
+
+    } @empty {
+
+      <div class="empty-spaces">
+        <div class="empty-icon">⌕</div>
+        <h3>No se encontraron espacios</h3>
+        <p>
+          No hay resultados que coincidan con tu búsqueda o filtro.
+        </p>
+        <button type="button" (click)="limpiarFiltros()">
+          Limpiar filtros
+        </button>
+      </div>
+
+    }
+
+  </div>
+
+  <!-- Nota informativa -->
+  <div class="inventory-note">
+    <div class="note-icon">i</div>
+    <div>
+      <strong>Información pendiente de validación</strong>
+      <p>
+        Este catálogo representa el inventario preliminar identificado
+        para el sistema. Las ubicaciones y asignaciones de responsables
+        que aún no han sido confirmadas se muestran como pendientes.
+      </p>
+    </div>
+  </div>
+
+</section>

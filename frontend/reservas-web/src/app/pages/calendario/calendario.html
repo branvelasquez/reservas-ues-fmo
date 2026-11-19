@@ -1,0 +1,196 @@
+
+<section class="calendario-page">
+
+  <!-- Encabezado -->
+  <div class="module-header">
+    <div>
+      <span class="module-eyebrow">PLANIFICACIÓN</span>
+      <h1>Calendario de reservas</h1>
+      <p>
+        Consulta las fechas y la programación de los espacios académicos.
+      </p>
+    </div>
+
+    <div class="calendar-status">
+      <span class="calendar-status-dot"></span>
+      Vista de demostración
+    </div>
+  </div>
+
+  <!-- Filtro de espacio -->
+  <div class="calendar-filter-panel">
+
+    <div class="filter-description">
+      <span class="filter-icon">▣</span>
+      <div>
+        <strong>Espacio académico</strong>
+        <small>Selecciona el espacio que deseas consultar.</small>
+      </div>
+    </div>
+
+    <select
+      [value]="espacioSeleccionado()"
+      (change)="actualizarEspacio($any($event.target).value)"
+    >
+      @for (espacio of espacios; track espacio) {
+        <option [value]="espacio">{{ espacio }}</option>
+      }
+    </select>
+
+  </div>
+
+  <!-- Calendario y detalle -->
+  <div class="calendar-layout">
+
+    <!-- Calendario principal -->
+    <section class="calendar-panel">
+
+      <div class="calendar-heading">
+
+        <div>
+          <span class="calendar-heading-label">CALENDARIO MENSUAL</span>
+          <h2>{{ nombreMes() }}</h2>
+        </div>
+
+        <div class="calendar-navigation">
+          <button
+            type="button"
+            class="today-button"
+            (click)="irAHoy()"
+          >
+            Hoy
+          </button>
+
+          <button
+            type="button"
+            class="month-button"
+            aria-label="Mes anterior"
+            title="Mes anterior"
+            (click)="cambiarMes(-1)"
+          >
+            ‹
+          </button>
+
+          <button
+            type="button"
+            class="month-button"
+            aria-label="Mes siguiente"
+            title="Mes siguiente"
+            (click)="cambiarMes(1)"
+          >
+            ›
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Días de la semana -->
+      <div class="calendar-weekdays">
+        <span>Lun</span>
+        <span>Mar</span>
+        <span>Mié</span>
+        <span>Jue</span>
+        <span>Vie</span>
+        <span>Sáb</span>
+        <span>Dom</span>
+      </div>
+
+      <!-- Días del mes -->
+      <div class="calendar-grid">
+
+        @for (dia of dias(); track dia.fecha) {
+
+          <button
+            type="button"
+            class="calendar-day"
+            [class.other-month]="!dia.mesActual"
+            [class.today]="dia.esHoy"
+            [class.selected-day]="dia.seleccionado"
+            [attr.aria-label]="dia.fecha"
+            [attr.aria-pressed]="dia.seleccionado"
+            (click)="seleccionarDia(dia.fecha)"
+          >
+            <span>{{ dia.numero }}</span>
+
+            @if (dia.esHoy) {
+              <span class="today-indicator"></span>
+            }
+
+          </button>
+
+        }
+
+      </div>
+
+      <!-- Referencias -->
+      <div class="calendar-legend">
+        <div>
+          <span class="legend-dot today-legend"></span>
+          <small>Fecha actual</small>
+        </div>
+
+        <div>
+          <span class="legend-dot selected-legend"></span>
+          <small>Fecha seleccionada</small>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- Panel lateral de información -->
+    <aside class="calendar-detail-panel">
+
+      <div class="detail-panel-header">
+        <span class="detail-panel-icon">▦</span>
+        <div>
+          <h3>Detalle del día</h3>
+          <p>Información de la fecha seleccionada.</p>
+        </div>
+      </div>
+
+      <div class="selected-date-box">
+        <small>FECHA SELECCIONADA</small>
+        <strong>{{ fechaSeleccionadaTexto() }}</strong>
+      </div>
+
+      <div class="selected-space-box">
+        <small>ESPACIO DE CONSULTA</small>
+        <strong>{{ espacioSeleccionado() }}</strong>
+      </div>
+
+      <div class="no-events-box">
+        <div class="no-events-icon">▤</div>
+        <strong>Sin reservas registradas</strong>
+        <p>
+          Todavía no hay información de reservas conectada
+          para esta fecha y espacio.
+        </p>
+      </div>
+
+      <div class="detail-panel-note">
+        <span>i</span>
+        <p>
+          Las reservas aparecerán aquí cuando el calendario
+          esté conectado con la información del sistema.
+        </p>
+      </div>
+
+    </aside>
+
+  </div>
+
+  <!-- Aviso de desarrollo -->
+  <div class="calendar-information">
+    <div class="information-icon">i</div>
+    <div>
+      <strong>Calendario en desarrollo</strong>
+      <p>
+        Esta versión permite navegar entre meses, seleccionar fechas
+        y elegir un espacio académico. La visualización de reservas
+        dependerá de la conexión con los horarios institucionales,
+        las solicitudes aprobadas y los bloqueos temporales.
+      </p>
+    </div>
+  </div>
+
+</section>

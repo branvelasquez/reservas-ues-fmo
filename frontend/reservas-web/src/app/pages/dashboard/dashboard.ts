@@ -3,7 +3,12 @@ import { Component, EventEmitter, Input, Output, signal } from '@angular/core';
 
 import { Sidebar } from '../../shared/sidebar/sidebar';
 import { Topbar } from '../../shared/topbar/topbar';
+
 import { Solicitudes } from '../solicitudes/solicitudes';
+import { Disponibilidad } from '../disponibilidad/disponibilidad';
+import { Espacios } from '../espacios/espacios';
+import { Calendario } from '../calendario/calendario';
+import { HorariosInstitucionales } from '../horarios-institucionales/horarios-institucionales';
 
 @Component({
   selector: 'app-dashboard',
@@ -11,7 +16,11 @@ import { Solicitudes } from '../solicitudes/solicitudes';
   imports: [
     Sidebar,
     Topbar,
-    Solicitudes
+    Solicitudes,
+    Disponibilidad,
+    Espacios,
+    Calendario,
+    HorariosInstitucionales
   ],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css'
