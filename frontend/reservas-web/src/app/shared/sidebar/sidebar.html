@@ -1,6 +1,7 @@
 
 <aside class="sidebar">
 
+  <!-- IDENTIDAD INSTITUCIONAL -->
   <div class="sidebar-brand">
     <div class="sidebar-logo">UES</div>
 
@@ -12,6 +13,7 @@
 
   <div class="sidebar-divider"></div>
 
+  <!-- MENÚ PRINCIPAL -->
   <div class="sidebar-section-label">
     MENÚ PRINCIPAL
   </div>
@@ -24,8 +26,13 @@
         [class.active]="activeModule === item.name"
         (click)="selectModule(item.name)"
       >
-        <span class="sidebar-link-icon">{{ item.icon }}</span>
-        <span class="sidebar-link-text">{{ item.name }}</span>
+        <span class="sidebar-link-icon">
+          {{ item.icon }}
+        </span>
+
+        <span class="sidebar-link-text">
+          {{ item.name }}
+        </span>
 
         @if (activeModule === item.name) {
           <span class="sidebar-active-indicator"></span>
@@ -34,16 +41,22 @@
     }
   </nav>
 
+  <!-- INFORMACIÓN DEL USUARIO Y SALIDA -->
   <div class="sidebar-bottom">
+
     <div class="sidebar-divider"></div>
 
     <div class="sidebar-user">
-      <div class="sidebar-user-avatar">U</div>
+
+      <div class="sidebar-user-avatar">
+        {{ userRoleName.charAt(0) }}
+      </div>
 
       <div class="sidebar-user-info">
-        <strong>Vista de demostración</strong>
-        <span>Usuario de prueba</span>
+        <strong>{{ userRoleName }}</strong>
+        <span>Perfil de demostración</span>
       </div>
+
     </div>
 
     <button
@@ -54,6 +67,7 @@
       <span class="sidebar-exit-icon">↪</span>
       <span>Salir del panel</span>
     </button>
+
   </div>
 
 </aside>

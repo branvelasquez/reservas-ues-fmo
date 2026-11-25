@@ -1,7 +1,6 @@
 
 <section class="calendario-page">
 
-  <!-- Encabezado -->
   <div class="module-header">
     <div>
       <span class="module-eyebrow">PLANIFICACIÓN</span>
@@ -13,13 +12,11 @@
 
     <div class="calendar-status">
       <span class="calendar-status-dot"></span>
-      Vista de demostración
+      Información actualizada
     </div>
   </div>
 
-  <!-- Filtro de espacio -->
   <div class="calendar-filter-panel">
-
     <div class="filter-description">
       <span class="filter-icon">▣</span>
       <div>
@@ -36,17 +33,13 @@
         <option [value]="espacio">{{ espacio }}</option>
       }
     </select>
-
   </div>
 
-  <!-- Calendario y detalle -->
   <div class="calendar-layout">
 
-    <!-- Calendario principal -->
     <section class="calendar-panel">
 
       <div class="calendar-heading">
-
         <div>
           <span class="calendar-heading-label">CALENDARIO MENSUAL</span>
           <h2>{{ nombreMes() }}</h2>
@@ -81,10 +74,8 @@
             ›
           </button>
         </div>
-
       </div>
 
-      <!-- Días de la semana -->
       <div class="calendar-weekdays">
         <span>Lun</span>
         <span>Mar</span>
@@ -95,34 +86,36 @@
         <span>Dom</span>
       </div>
 
-      <!-- Días del mes -->
       <div class="calendar-grid">
-
         @for (dia of dias(); track dia.fecha) {
-
           <button
             type="button"
             class="calendar-day"
             [class.other-month]="!dia.mesActual"
             [class.today]="dia.esHoy"
             [class.selected-day]="dia.seleccionado"
+            [class.has-reservations]="dia.tieneReservas"
             [attr.aria-label]="dia.fecha"
             [attr.aria-pressed]="dia.seleccionado"
             (click)="seleccionarDia(dia.fecha)"
           >
             <span>{{ dia.numero }}</span>
 
+            @if (dia.tieneReservas) {
+              <span
+                class="reservation-indicator"
+                [class.pending-indicator]="dia.tieneEnProceso"
+                [class.occupied-indicator]="!dia.tieneEnProceso && dia.tieneAprobadas"
+              ></span>
+            }
+
             @if (dia.esHoy) {
               <span class="today-indicator"></span>
             }
-
           </button>
-
         }
-
       </div>
 
-      <!-- Referencias -->
       <div class="calendar-legend">
         <div>
           <span class="legend-dot today-legend"></span>
@@ -133,11 +126,20 @@
           <span class="legend-dot selected-legend"></span>
           <small>Fecha seleccionada</small>
         </div>
+
+        <div>
+          <span class="legend-dot pending-legend"></span>
+          <small>En proceso</small>
+        </div>
+
+        <div>
+          <span class="legend-dot occupied-legend"></span>
+          <small>Ocupado</small>
+        </div>
       </div>
 
     </section>
 
-    <!-- Panel lateral de información -->
     <aside class="calendar-detail-panel">
 
       <div class="detail-panel-header">
@@ -158,37 +160,102 @@
         <strong>{{ espacioSeleccionado() }}</strong>
       </div>
 
-      <div class="no-events-box">
-        <div class="no-events-icon">▤</div>
-        <strong>Sin reservas registradas</strong>
-        <p>
-          Todavía no hay información de reservas conectada
-          para esta fecha y espacio.
-        </p>
+      <div class="reservation-counts">
+        <div>
+          <strong>{{ reservasEnProceso().length }}</strong>
+          <small>En proceso</small>
+        </div>
+        <div>
+          <strong>{{ reservasAprobadas().length }}</strong>
+          <small>Ocupadas</small>
+        </div>
       </div>
 
-      <div class="detail-panel-note">
-        <span>i</span>
-        <p>
-          Las reservas aparecerán aquí cuando el calendario
-          esté conectado con la información del sistema.
-        </p>
-      </div>
+      @if (reservasDelDia().length === 0) {
+        <div class="no-events-box">
+          <div class="no-events-icon">▤</div>
+          <strong>Sin reservas registradas</strong>
+          <p>
+            No hay solicitudes pendientes ni reservas aprobadas
+            para esta fecha y espacio.
+          </p>
+        </div>
+      } @else {
+        <div class="calendar-reservations-list">
+
+          @for (reserva of reservasDelDia(); track reserva.id) {
+            <article class="calendar-reservation-card">
+
+              <div class="reservation-card-top">
+                <span class="reservation-space">
+                  {{ reserva.espacio }}
+                </span>
+
+                <span
+                  class="reservation-status"
+                  [class.pending]="obtenerClaseEstado(reserva) === 'pending'"
+                  [class.occupied]="obtenerClaseEstado(reserva) === 'occupied'"
+                >
+                  {{ obtenerEstadoVisible(reserva) }}
+                </span>
+              </div>
+
+              <h4>{{ reserva.tipoActividad }}</h4>
+
+              <div class="reservation-detail-line">
+                <span>Responsable</span>
+                <strong>{{ reserva.docente }}</strong>
+              </div>
+
+              <div class="reservation-detail-line">
+                <span>Horario</span>
+                <strong>
+                  {{ formatearHora(reserva.horaInicio) }}
+                  – {{ formatearHora(reserva.horaFin) }}
+                </strong>
+              </div>
+
+              <div class="reservation-detail-line">
+                <span>Asignatura</span>
+                <strong>{{ reserva.asignatura }}</strong>
+              </div>
+
+              <div class="reservation-reason">
+                <small>Motivo de la actividad</small>
+                <p>{{ reserva.motivo }}</p>
+              </div>
+
+              @if (
+                reserva.estado === 'Pendiente de revisión' ||
+                reserva.estado === 'En revisión'
+              ) {
+                <div class="reservation-notice pending-notice">
+                  Esta solicitud está en proceso de revisión.
+                </div>
+              } @else {
+                <div class="reservation-notice approved-notice">
+                  Esta reserva está aprobada y el espacio se encuentra ocupado.
+                </div>
+              }
+
+            </article>
+          }
+
+        </div>
+      }
 
     </aside>
 
   </div>
 
-  <!-- Aviso de desarrollo -->
   <div class="calendar-information">
     <div class="information-icon">i</div>
     <div>
-      <strong>Calendario en desarrollo</strong>
+      <strong>Información del calendario</strong>
       <p>
-        Esta versión permite navegar entre meses, seleccionar fechas
-        y elegir un espacio académico. La visualización de reservas
-        dependerá de la conexión con los horarios institucionales,
-        las solicitudes aprobadas y los bloqueos temporales.
+        Las solicitudes pendientes se muestran como «En proceso».
+        Únicamente las solicitudes aprobadas se consideran reservas
+        confirmadas. Las solicitudes rechazadas o canceladas no se muestran.
       </p>
     </div>
   </div>

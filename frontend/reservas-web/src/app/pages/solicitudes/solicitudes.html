@@ -1,136 +1,289 @@
 
 <section class="solicitudes-page">
 
+  <!-- ENCABEZADO -->
   <header class="module-header">
     <div>
-      <span class="module-eyebrow">GESTIÓN ACADÉMICA</span>
-      <h1>Solicitudes de reserva</h1>
-      <p>
-        Registro y seguimiento de solicitudes para laboratorios
-        y aulas de cómputo de la FMO.
-      </p>
+      <span class="module-eyebrow">
+        {{ esAdministrador ? 'GESTIÓN ACADÉMICA' : 'PORTAL ACADÉMICO' }}
+      </span>
+      <h1>{{ tituloModulo }}</h1>
+      <p>{{ descripcionModulo }}</p>
     </div>
 
-    <button
-      type="button"
-      class="new-request-button"
-      (click)="abrirFormulario()">
-      <span>＋</span>
-      Nueva solicitud
-    </button>
+    @if (!esVistaNueva) {
+      <button
+        type="button"
+        class="new-request-button"
+        (click)="abrirFormulario()">
+        <span>＋</span>
+        Nueva solicitud
+      </button>
+    }
   </header>
 
-  <section class="request-summary">
+  <!-- INDICADORES ADMINISTRATIVOS -->
+  @if (esAdministrador) {
+    <section class="request-summary">
 
-    <article class="summary-card">
-      <div class="summary-icon blue">▤</div>
-      <div>
-        <span>Total de solicitudes</span>
-        <strong>—</strong>
-        <small>Sin registros todavía</small>
-      </div>
-    </article>
+      <article class="summary-card">
+        <div class="summary-icon blue">▤</div>
+        <div>
+          <span>Total de solicitudes</span>
+          <strong>{{ totalSolicitudes() }}</strong>
+          <small>Registros realizados</small>
+        </div>
+      </article>
 
-    <article class="summary-card">
-      <div class="summary-icon orange">◷</div>
-      <div>
-        <span>Pendientes de revisión</span>
-        <strong>—</strong>
-        <small>Sin registros todavía</small>
-      </div>
-    </article>
+      <article class="summary-card">
+        <div class="summary-icon orange">◷</div>
+        <div>
+          <span>Pendientes de revisión</span>
+          <strong>{{ pendientes() }}</strong>
+          <small>Esperando revisión</small>
+        </div>
+      </article>
 
-    <article class="summary-card">
-      <div class="summary-icon green">✓</div>
-      <div>
-        <span>Aprobadas</span>
-        <strong>—</strong>
-        <small>Sin registros todavía</small>
-      </div>
-    </article>
+      <article class="summary-card">
+        <div class="summary-icon green">✓</div>
+        <div>
+          <span>Aprobadas</span>
+          <strong>{{ aprobadas() }}</strong>
+          <small>Solicitudes aprobadas</small>
+        </div>
+      </article>
 
-    <article class="summary-card">
-      <div class="summary-icon red">✕</div>
-      <div>
-        <span>Rechazadas</span>
-        <strong>—</strong>
-        <small>Sin registros todavía</small>
-      </div>
-    </article>
+      <article class="summary-card">
+        <div class="summary-icon red">✕</div>
+        <div>
+          <span>Rechazadas</span>
+          <strong>{{ rechazadas() }}</strong>
+          <small>Solicitudes rechazadas</small>
+        </div>
+      </article>
 
-  </section>
+    </section>
+  }
 
-  <section class="requests-panel">
-
-    <div class="requests-panel-header">
-      <div>
-        <h2>Listado de solicitudes</h2>
-        <p>Consultá y revisá las solicitudes registradas.</p>
-      </div>
-    </div>
-
-    <div class="requests-filters">
-
-      <div class="search-field">
-        <span>⌕</span>
-        <input
-          type="search"
-          placeholder="Buscar solicitud..."
-          [value]="busqueda()"
-          (input)="actualizarBusqueda($any($event.target).value)">
+  <!-- FORMULARIO DE NUEVA SOLICITUD -->
+  @if (esVistaNueva) {
+    <section class="requests-panel new-request-panel">
+      <div class="requests-panel-header">
+        <div>
+          <h2>Registrar una reserva</h2>
+          <p>
+            Completá los datos de la actividad académica
+            para enviar tu solicitud al encargado.
+          </p>
+        </div>
       </div>
 
-      <select
-        [value]="estadoFiltro()"
-        (change)="actualizarEstado($any($event.target).value)">
-        @for (estado of estados; track estado) {
-          <option [value]="estado">{{ estado }}</option>
-        }
-      </select>
+      <div class="form-notice">
+        <strong>Antes de continuar</strong>
+        <p>
+          La solicitud será enviada para revisión. El registro
+          no garantiza la aprobación ni confirma la disponibilidad
+          del espacio.
+        </p>
+      </div>
 
-    </div>
+      <div class="new-request-actions">
+        <button
+          type="button"
+          class="new-request-button"
+          (click)="abrirFormulario()">
+          <span>＋</span>
+          Completar solicitud
+        </button>
+      </div>
+    </section>
+  }
 
-    <div class="requests-table-wrapper">
-      <table class="requests-table">
-        <thead>
-          <tr>
-            <th>Solicitud</th>
-            <th>Espacio</th>
-            <th>Fecha</th>
-            <th>Horario</th>
-            <th>Solicitante</th>
-            <th>Estado</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
+  <!-- LISTADO DE SOLICITUDES -->
+  @if (!esVistaNueva) {
+    <section class="requests-panel">
 
-        <tbody>
-          @if (solicitudes.length === 0) {
-            <tr>
-              <td colspan="7">
-                <div class="empty-state">
-                  <div class="empty-icon">▤</div>
-                  <h3>No hay solicitudes registradas</h3>
-                  <p>
-                    Cuando se registren solicitudes,
-                    aparecerán en este listado.
-                  </p>
-                  <button
-                    type="button"
-                    class="empty-action"
-                    (click)="abrirFormulario()">
-                    Registrar primera solicitud
-                  </button>
-                </div>
-              </td>
-            </tr>
+      <div class="requests-panel-header">
+        <div>
+          <h2>
+            {{ esAdministrador ? 'Listado de solicitudes' : 'Historial de mis solicitudes' }}
+          </h2>
+          <p>
+            @if (esAdministrador) {
+              Consultá, revisá y gestioná las solicitudes registradas.
+            } @else {
+              Consultá el estado y los detalles de tus solicitudes de reserva.
+            }
+          </p>
+        </div>
+      </div>
+
+      <!-- FILTROS -->
+      <div class="requests-filters">
+
+        <div class="search-field">
+          <span>⌕</span>
+          <input
+            type="search"
+            placeholder="Buscar por código, espacio, carrera o docente..."
+            [value]="busqueda()"
+            (input)="actualizarBusqueda($any($event.target).value)">
+        </div>
+
+        <select
+          [value]="estadoFiltro()"
+          (change)="actualizarEstado($any($event.target).value)">
+          @for (estado of estados; track estado) {
+            <option [value]="estado">{{ estado }}</option>
           }
-        </tbody>
-      </table>
-    </div>
+        </select>
 
-  </section>
+      </div>
 
+      <!-- TABLA -->
+      <div class="requests-table-wrapper">
+        <table class="requests-table">
+
+          <thead>
+            <tr>
+              <th>Solicitud</th>
+              <th>Espacio</th>
+              <th>Fecha</th>
+              <th>Horario</th>
+
+              @if (esAdministrador) {
+                <th>Solicitante</th>
+              }
+
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+
+          <tbody>
+
+            @for (solicitud of solicitudesFiltradas(); track solicitud.id) {
+              <tr>
+
+                <td>
+                  <strong>{{ solicitud.id }}</strong>
+                </td>
+
+                <td>{{ solicitud.espacio }}</td>
+
+                <td>{{ solicitud.fecha }}</td>
+
+                <td>
+                  {{ solicitud.horaInicio }} - {{ solicitud.horaFin }}
+                </td>
+
+                @if (esAdministrador) {
+                  <td>{{ solicitud.docente }}</td>
+                }
+
+                <td>
+                  <span
+                    class="request-status"
+                    [ngClass]="obtenerClaseEstado(solicitud.estado)">
+                    {{ solicitud.estado }}
+                  </span>
+                </td>
+
+                <td>
+                  <div class="request-actions">
+
+                    <button
+                      type="button"
+                      class="action-button detail-button"
+                      title="Consultar detalles"
+                      (click)="abrirDetalle(solicitud)">
+                      Ver
+                    </button>
+
+                    @if (esAdministrador) {
+
+                      @if (solicitud.estado === 'Pendiente de revisión') {
+                        <button
+                          type="button"
+                          class="action-button review-button"
+                          (click)="iniciarRevision(solicitud)">
+                          Revisar
+                        </button>
+                      }
+
+                      @if (solicitud.estado === 'En revisión') {
+                        <button
+                          type="button"
+                          class="action-button approve-button"
+                          (click)="aprobarSolicitud(solicitud)">
+                          Aprobar
+                        </button>
+
+                        <button
+                          type="button"
+                          class="action-button reject-button"
+                          (click)="abrirRechazo(solicitud)">
+                          Rechazar
+                        </button>
+                      }
+
+                    }
+
+                  </div>
+                </td>
+
+              </tr>
+            }
+
+            @if (solicitudesFiltradas().length === 0) {
+              <tr>
+                <td [attr.colspan]="esAdministrador ? 7 : 6">
+                  <div class="empty-state">
+                    <div class="empty-icon">▤</div>
+
+                    @if (busqueda() || estadoFiltro() !== 'Todos') {
+                      <h3>No se encontraron solicitudes</h3>
+                      <p>
+                        Probá cambiar el texto de búsqueda
+                        o seleccionar otro estado.
+                      </p>
+                    } @else {
+                      <h3>
+                        {{ esAdministrador
+                          ? 'No hay solicitudes registradas'
+                          : 'Todavía no tenés solicitudes'
+                        }}
+                      </h3>
+
+                      <p>
+                        {{ esAdministrador
+                          ? 'Cuando se registren solicitudes, aparecerán en este listado.'
+                          : 'Cuando enviés una solicitud de reserva, podrás consultar su estado aquí.'
+                        }}
+                      </p>
+
+                      @if (!esAdministrador) {
+                        <button
+                          type="button"
+                          class="empty-action"
+                          (click)="abrirFormulario()">
+                          Crear primera solicitud
+                        </button>
+                      }
+                    }
+                  </div>
+                </td>
+              </tr>
+            }
+
+          </tbody>
+        </table>
+      </div>
+
+    </section>
+  }
+
+  <!-- MODAL: NUEVA SOLICITUD -->
   @if (mostrarFormulario()) {
     <div class="modal-overlay" (click)="cerrarFormulario()">
 
@@ -153,92 +306,161 @@
           </button>
         </header>
 
-        <form class="request-form">
+        <form class="request-form" (ngSubmit)="registrarSolicitud()">
 
           <div class="form-grid">
 
             <div class="field-group full-width">
-              <label for="space">Espacio solicitado</label>
-              <select id="space" required>
+              <label for="space">Espacio solicitado *</label>
+              <select
+                id="space"
+                name="espacio"
+                [(ngModel)]="formulario.espacio"
+                required>
                 <option value="">Seleccionar espacio</option>
-                <option>Laboratorio de Física</option>
-                <option>Laboratorio de Química</option>
-                <option>Laboratorio de Industrial</option>
-                <option>Laboratorio de Biología</option>
-                <option>Laboratorio de Realidad Virtual</option>
-                <option>Aula de cómputo A</option>
-                <option>Aula de cómputo B</option>
-                <option>Aula de cómputo C</option>
+                @for (espacio of espacios; track espacio) {
+                  <option [value]="espacio">{{ espacio }}</option>
+                }
               </select>
             </div>
 
             <div class="field-group">
-              <label for="date">Fecha</label>
-              <input id="date" type="date" required>
+              <label for="date">Fecha de reserva *</label>
+              <input
+                id="date"
+                name="fecha"
+                type="date"
+                [(ngModel)]="formulario.fecha"
+                required>
             </div>
 
             <div class="field-group">
-              <label for="activity">Tipo de actividad</label>
+              <label for="activity">Tipo de actividad *</label>
               <input
                 id="activity"
+                name="tipoActividad"
                 type="text"
-                placeholder="Tipo de actividad"
+                placeholder="Ej. Práctica de laboratorio"
+                [(ngModel)]="formulario.tipoActividad"
                 required>
             </div>
 
             <div class="field-group">
-              <label for="startTime">Hora de inicio</label>
-              <input id="startTime" type="time" required>
+              <label for="startTime">Hora de inicio *</label>
+              <input
+                id="startTime"
+                name="horaInicio"
+                type="time"
+                [(ngModel)]="formulario.horaInicio"
+                required>
             </div>
 
             <div class="field-group">
-              <label for="endTime">Hora de finalización</label>
-              <input id="endTime" type="time" required>
+              <label for="endTime">Hora de finalización *</label>
+              <input
+                id="endTime"
+                name="horaFin"
+                type="time"
+                [(ngModel)]="formulario.horaFin"
+                required>
             </div>
 
             <div class="field-group">
-              <label for="subject">Asignatura</label>
+              <label for="career">Carrera *</label>
+              <input
+                id="career"
+                name="carrera"
+                type="text"
+                placeholder="Nombre de la carrera"
+                [(ngModel)]="formulario.carrera"
+                required>
+            </div>
+
+            <div class="field-group">
+              <label for="subject">Asignatura *</label>
               <input
                 id="subject"
+                name="asignatura"
                 type="text"
                 placeholder="Nombre de la asignatura"
+                [(ngModel)]="formulario.asignatura"
                 required>
             </div>
 
             <div class="field-group">
-              <label for="group">Grupo</label>
+              <label for="teacher">Docente responsable *</label>
               <input
-                id="group"
+                id="teacher"
+                name="docente"
                 type="text"
-                placeholder="Identificación del grupo"
+                placeholder="Nombre del docente"
+                [(ngModel)]="formulario.docente"
                 required>
             </div>
 
             <div class="field-group">
-              <label for="students">Cantidad de estudiantes</label>
+              <label for="students">Cantidad de participantes *</label>
               <input
                 id="students"
+                name="participantes"
                 type="number"
                 min="1"
                 placeholder="Cantidad"
+                [(ngModel)]="formulario.participantes"
                 required>
             </div>
 
             <div class="field-group full-width">
-              <label for="resources">Software o recursos requeridos</label>
+              <label for="reason">Motivo de la solicitud *</label>
               <textarea
-                id="resources"
+                id="reason"
+                name="motivo"
                 rows="3"
-                placeholder="Describí el software o los recursos que necesitás..."></textarea>
+                placeholder="Explicá para qué necesitás reservar el espacio..."
+                [(ngModel)]="formulario.motivo"
+                required></textarea>
+            </div>
+
+            <div class="field-group full-width">
+              <label for="attachments">Documentos adjuntos</label>
+              <input
+                id="attachments"
+                type="file"
+                accept=".pdf,.jpg,.jpeg,.png"
+                multiple
+                (change)="actualizarArchivos($event)">
+
+              <small class="attachment-help">
+                Máximo 3 archivos. Formatos PDF, JPG o PNG.
+                Hasta 5 MB por archivo.
+              </small>
+
+              @for (archivo of archivosSeleccionados(); track archivo.name; let i = $index) {
+                <div class="selected-file">
+                  <span>{{ archivo.name }}</span>
+                  <button
+                    type="button"
+                    (click)="quitarArchivo(i)">
+                    Quitar
+                  </button>
+                </div>
+              }
             </div>
 
           </div>
 
+          @if (mensajeError()) {
+            <div class="form-error">
+              {{ mensajeError() }}
+            </div>
+          }
+
           <div class="form-notice">
             <strong>Importante</strong>
             <p>
-              El registro estará sujeto a las validaciones de disponibilidad
-              y a la revisión correspondiente.
+              La solicitud quedará pendiente de revisión.
+              El registro no garantiza la aprobación ni confirma
+              la disponibilidad del espacio.
             </p>
           </div>
 
@@ -250,16 +472,244 @@
               Cancelar
             </button>
 
-            <button type="button" class="submit-request-button" disabled>
+            <button type="submit" class="submit-request-button">
               Registrar solicitud
             </button>
           </footer>
 
           <p class="form-development-note">
-            El registro real se habilitará al conectar el backend.
+            Registro temporal en el frontend, pendiente de conexión con el backend.
           </p>
 
         </form>
+      </section>
+    </div>
+  }
+
+  <!-- MODAL: DETALLE DE SOLICITUD -->
+  @if (mostrarDetalle() && solicitudSeleccionada(); as solicitud) {
+    <div class="modal-overlay" (click)="cerrarDetalle()">
+
+      <section
+        class="request-modal detail-modal"
+        (click)="$event.stopPropagation()">
+
+        <header class="modal-header">
+          <div>
+            <span class="module-eyebrow">
+              {{ esAdministrador ? 'CONSULTA ADMINISTRATIVA' : 'DETALLE DE MI SOLICITUD' }}
+            </span>
+            <h2>Detalle de solicitud</h2>
+            <p>Información completa del registro {{ solicitud.id }}.</p>
+          </div>
+
+          <button
+            type="button"
+            class="modal-close"
+            (click)="cerrarDetalle()">
+            ×
+          </button>
+        </header>
+
+        <div class="detail-status">
+          <span>Estado actual</span>
+          <span
+            class="request-status"
+            [ngClass]="obtenerClaseEstado(solicitud.estado)">
+            {{ solicitud.estado }}
+          </span>
+        </div>
+
+        <div class="detail-grid">
+
+          <div class="detail-item">
+            <span>Código</span>
+            <strong>{{ solicitud.id }}</strong>
+          </div>
+
+          <div class="detail-item">
+            <span>Espacio solicitado</span>
+            <strong>{{ solicitud.espacio }}</strong>
+          </div>
+
+          <div class="detail-item">
+            <span>Fecha</span>
+            <strong>{{ solicitud.fecha }}</strong>
+          </div>
+
+          <div class="detail-item">
+            <span>Horario</span>
+            <strong>{{ solicitud.horaInicio }} - {{ solicitud.horaFin }}</strong>
+          </div>
+
+          <div class="detail-item">
+            <span>Carrera</span>
+            <strong>{{ solicitud.carrera }}</strong>
+          </div>
+
+          <div class="detail-item">
+            <span>Asignatura</span>
+            <strong>{{ solicitud.asignatura }}</strong>
+          </div>
+
+          <div class="detail-item">
+            <span>Docente responsable</span>
+            <strong>{{ solicitud.docente }}</strong>
+          </div>
+
+          <div class="detail-item">
+            <span>Participantes</span>
+            <strong>{{ solicitud.participantes }}</strong>
+          </div>
+
+          <div class="detail-item full-width">
+            <span>Tipo de actividad</span>
+            <strong>{{ solicitud.tipoActividad }}</strong>
+          </div>
+
+          <div class="detail-item full-width">
+            <span>Motivo de la reserva</span>
+            <p>{{ solicitud.motivo }}</p>
+          </div>
+
+          <div class="detail-item full-width">
+            <span>Archivos adjuntos</span>
+
+            @if (solicitud.archivos.length > 0) {
+              @for (archivo of solicitud.archivos; track archivo) {
+                <p class="detail-file">▤ {{ archivo }}</p>
+              }
+            } @else {
+              <p>No se adjuntaron documentos.</p>
+            }
+          </div>
+
+          @if (solicitud.motivoRechazo) {
+            <div class="detail-item full-width rejection-reason">
+              <span>Motivo del rechazo</span>
+              <p>{{ solicitud.motivoRechazo }}</p>
+            </div>
+          }
+
+        </div>
+
+        <footer class="modal-actions">
+
+          @if (esAdministrador) {
+
+            @if (solicitud.estado === 'Pendiente de revisión') {
+              <button
+                type="button"
+                class="review-button action-button"
+                (click)="iniciarRevision(solicitud)">
+                Iniciar revisión
+              </button>
+            }
+
+            @if (solicitud.estado === 'En revisión') {
+              <button
+                type="button"
+                class="approve-button action-button"
+                (click)="aprobarSolicitud(solicitud)">
+                Aprobar solicitud
+              </button>
+
+              <button
+                type="button"
+                class="reject-button action-button"
+                (click)="abrirRechazo(solicitud)">
+                Rechazar solicitud
+              </button>
+            }
+
+          }
+
+          <button
+            type="button"
+            class="cancel-button"
+            (click)="cerrarDetalle()">
+            Cerrar
+          </button>
+
+        </footer>
+
+      </section>
+    </div>
+  }
+
+  <!-- MODAL: JUSTIFICAR RECHAZO -->
+  @if (mostrarRechazo() && esAdministrador) {
+    <div class="modal-overlay" (click)="cerrarRechazo()">
+
+      <section
+        class="request-modal rejection-modal"
+        (click)="$event.stopPropagation()">
+
+        <header class="modal-header">
+          <div>
+            <span class="module-eyebrow">RESOLUCIÓN ADMINISTRATIVA</span>
+            <h2>Rechazar solicitud</h2>
+            <p>
+              Indicá la razón por la que no se puede aprobar esta solicitud.
+            </p>
+          </div>
+
+          <button
+            type="button"
+            class="modal-close"
+            (click)="cerrarRechazo()">
+            ×
+          </button>
+        </header>
+
+        @if (solicitudSeleccionada(); as solicitud) {
+          <div class="rejection-summary">
+            <strong>{{ solicitud.id }}</strong>
+            <span>{{ solicitud.espacio }}</span>
+            <span>{{ solicitud.fecha }}</span>
+          </div>
+        }
+
+        <div class="field-group">
+          <label for="rejectionReason">Motivo del rechazo *</label>
+          <textarea
+            id="rejectionReason"
+            rows="5"
+            placeholder="Explicá por qué se rechaza la solicitud..."
+            [ngModel]="motivoRechazo()"
+            (ngModelChange)="motivoRechazo.set($event)"
+            [ngModelOptions]="{standalone: true}"></textarea>
+        </div>
+
+        @if (mensajeError()) {
+          <div class="form-error">
+            {{ mensajeError() }}
+          </div>
+        }
+
+        <div class="form-notice">
+          <strong>Importante</strong>
+          <p>
+            El motivo es obligatorio y debe quedar registrado
+            junto con la resolución de la solicitud.
+          </p>
+        </div>
+
+        <footer class="modal-actions">
+          <button
+            type="button"
+            class="cancel-button"
+            (click)="cerrarRechazo()">
+            Volver
+          </button>
+
+          <button
+            type="button"
+            class="reject-button action-button"
+            (click)="rechazarSolicitud()">
+            Confirmar rechazo
+          </button>
+        </footer>
 
       </section>
     </div>

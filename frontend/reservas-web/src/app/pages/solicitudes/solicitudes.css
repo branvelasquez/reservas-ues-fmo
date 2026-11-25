@@ -48,17 +48,21 @@
   font-weight: 700;
   font-size: 14px;
   cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
 }
 
 .new-request-button:hover {
   background: #326da9;
+  transform: translateY(-1px);
 }
 
 .new-request-button span {
   font-size: 20px;
 }
 
-/* Resumen */
+/* =========================================
+   TARJETAS DE RESUMEN
+   ========================================= */
 
 .request-summary {
   display: grid;
@@ -72,8 +76,15 @@
   gap: 15px;
   min-height: 115px;
   padding: 20px;
-  border: 1px solid #344b65;
+  border: 1px solid var(--border-color, #344b65);
   border-radius: 12px;
+  background: var(--surface-color, #17283b);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.summary-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 7px 18px rgba(0, 0, 0, 0.12);
 }
 
 .summary-icon {
@@ -113,24 +124,30 @@
 }
 
 .summary-card span {
+  color: var(--text-secondary, #aab9ca);
   font-size: 12px;
 }
 
 .summary-card strong {
+  color: var(--text-primary, #f4f7fb);
   font-size: 24px;
 }
 
 .summary-card small {
+  color: var(--text-secondary, #aab9ca);
   font-size: 11px;
-  opacity: 0.7;
+  opacity: 0.8;
 }
 
-/* Listado */
+/* =========================================
+   PANEL Y LISTADO
+   ========================================= */
 
 .requests-panel {
-  border: 1px solid #344b65;
+  border: 1px solid var(--border-color, #344b65);
   border-radius: 13px;
   overflow: hidden;
+  background: var(--surface-color, #17283b);
 }
 
 .requests-panel-header {
@@ -138,14 +155,20 @@
 }
 
 .requests-panel-header h2 {
+  color: var(--text-primary, #f4f7fb);
   font-size: 20px;
   margin: 0 0 7px;
 }
 
 .requests-panel-header p {
+  color: var(--text-secondary, #aab9ca);
   font-size: 13px;
   margin: 0;
 }
+
+/* =========================================
+   FILTROS Y BÚSQUEDA
+   ========================================= */
 
 .requests-filters {
   display: flex;
@@ -161,11 +184,19 @@
   flex: 1;
   min-height: 43px;
   padding: 0 13px;
-  border: 1px solid #52677e;
+  border: 1px solid var(--border-color, #52677e);
   border-radius: 8px;
+  background: var(--background-color, transparent);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.search-field:focus-within {
+  border-color: #72a9e6;
+  box-shadow: 0 0 0 3px rgba(114, 169, 230, 0.12);
 }
 
 .search-field span {
+  color: var(--text-secondary, #aab9ca);
   font-size: 20px;
 }
 
@@ -174,20 +205,29 @@
   border: none;
   outline: none;
   background: transparent;
-  color: inherit;
+  color: var(--text-primary, #f4f7fb);
   font-size: 13px;
+}
+
+.search-field input::placeholder {
+  color: var(--text-secondary, #aab9ca);
 }
 
 .requests-filters select {
   min-width: 190px;
   min-height: 43px;
   padding: 8px 12px;
-  border: 1px solid #52677e;
+  border: 1px solid var(--border-color, #52677e);
   border-radius: 8px;
-  background: transparent;
-  color: inherit;
+  background: var(--surface-color, #17283b);
+  color: var(--text-primary, #f4f7fb);
   font-size: 13px;
+  outline: none;
 }
+
+/* =========================================
+   TABLA
+   ========================================= */
 
 .requests-table-wrapper {
   width: 100%;
@@ -206,16 +246,28 @@
   font-size: 12px;
   font-weight: 700;
   white-space: nowrap;
-  background: rgba(110,140,170,0.12);
+  color: var(--text-primary, #f4f7fb);
+  background: rgba(110, 140, 170, 0.12);
 }
 
 .requests-table td {
   padding: 15px;
   font-size: 13px;
-  border-top: 1px solid rgba(120,145,170,0.2);
+  color: var(--text-primary, #f4f7fb);
+  border-top: 1px solid rgba(120, 145, 170, 0.2);
 }
 
-/* Estado vacío */
+.requests-table tbody tr:hover {
+  background: rgba(110, 140, 170, 0.06);
+}
+
+.requests-table td strong {
+  color: var(--text-primary, #f4f7fb);
+}
+
+/* =========================================
+   ESTADO VACÍO
+   ========================================= */
 
 .empty-state {
   display: flex;
@@ -232,19 +284,21 @@
   display: grid;
   place-items: center;
   border-radius: 16px;
-  background: rgba(80,135,195,0.13);
+  background: rgba(80, 135, 195, 0.13);
   color: #77b5fa;
   font-size: 30px;
   margin-bottom: 17px;
 }
 
 .empty-state h3 {
+  color: var(--text-primary, #f4f7fb);
   font-size: 18px;
   margin: 0 0 9px;
 }
 
 .empty-state p {
   max-width: 400px;
+  color: var(--text-secondary, #aab9ca);
   font-size: 13px;
   line-height: 1.6;
 }
@@ -255,12 +309,21 @@
   border: 1px solid #477eb8;
   border-radius: 8px;
   background: transparent;
-  color: inherit;
+  color: var(--text-primary, #f4f7fb);
   font-weight: 700;
   cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-/* Modal */
+.empty-action:hover {
+  background: #24558a;
+  border-color: #24558a;
+  color: white;
+}
+
+/* =========================================
+   MODAL
+   ========================================= */
 
 .modal-overlay {
   position: fixed;
@@ -270,7 +333,7 @@
   align-items: center;
   justify-content: center;
   padding: 25px;
-  background: rgba(5,15,28,0.72);
+  background: rgba(5, 15, 28, 0.72);
   backdrop-filter: blur(4px);
 }
 
@@ -283,7 +346,7 @@
   border-radius: 16px;
   background: #17283b;
   color: #f4f7fb;
-  box-shadow: 0 20px 65px rgba(0,0,0,0.3);
+  box-shadow: 0 20px 65px rgba(0, 0, 0, 0.3);
 }
 
 .modal-header {
@@ -299,6 +362,7 @@
 }
 
 .modal-header p {
+  color: #aab9ca;
   font-size: 13px;
 }
 
@@ -312,7 +376,16 @@
   color: white;
   font-size: 24px;
   cursor: pointer;
+  transition: background 0.2s ease;
 }
+
+.modal-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* =========================================
+   FORMULARIO
+   ========================================= */
 
 .form-grid {
   display: grid;
@@ -327,6 +400,7 @@
 }
 
 .field-group label {
+  color: #f4f7fb;
   font-size: 13px;
   font-weight: 700;
 }
@@ -344,6 +418,8 @@
   color: #ffffff;
   font-size: 13px;
   font-family: inherit;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .field-group textarea {
@@ -354,6 +430,7 @@
 .field-group select:focus,
 .field-group textarea:focus {
   border-color: #72a9e6;
+  box-shadow: 0 0 0 3px rgba(114, 169, 230, 0.12);
 }
 
 .field-group input::placeholder,
@@ -361,16 +438,25 @@
   color: #aab9ca;
 }
 
+.field-group select option {
+  background: #20344b;
+  color: white;
+}
+
 .full-width {
   grid-column: 1 / -1;
 }
+
+/* =========================================
+   AVISO DEL FORMULARIO
+   ========================================= */
 
 .form-notice {
   margin-top: 25px;
   padding: 15px;
   border: 1px solid #796a46;
   border-radius: 8px;
-  background: rgba(218,173,81,0.09);
+  background: rgba(218, 173, 81, 0.09);
 }
 
 .form-notice strong {
@@ -379,10 +465,15 @@
 }
 
 .form-notice p {
+  color: #d5dce5;
   font-size: 12px;
   line-height: 1.6;
   margin-top: 6px;
 }
+
+/* =========================================
+   BOTONES DEL MODAL
+   ========================================= */
 
 .modal-actions {
   display: flex;
@@ -399,6 +490,7 @@
   font-size: 13px;
   font-weight: 700;
   cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
 }
 
 .cancel-button {
@@ -407,25 +499,121 @@
   color: white;
 }
 
+.cancel-button:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
 .submit-request-button {
   border: none;
   background: #326da9;
   color: white;
 }
 
+.submit-request-button:hover {
+  background: #4183c4;
+  transform: translateY(-1px);
+}
+
 .submit-request-button:disabled {
   opacity: 0.55;
   cursor: not-allowed;
+  transform: none;
 }
 
 .form-development-note {
   margin-top: 15px;
   text-align: right;
+  color: #aab9ca;
   font-size: 11px;
   opacity: 0.7;
 }
 
-/* Responsive */
+/* =========================================
+   ESTADOS DE LAS SOLICITUDES
+   ========================================= */
+
+.request-status {
+  display: inline-block;
+  padding: 6px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.request-status.pending {
+  background: #fff0d8;
+  color: #a66a13;
+}
+
+.request-status.review {
+  background: #e3efff;
+  color: #2364b4;
+}
+
+.request-status.approved {
+  background: #e0f5e9;
+  color: #16845b;
+}
+
+.request-status.rejected {
+  background: #ffe5e5;
+  color: #c34747;
+}
+
+.request-status.cancelled {
+  background: #e5e7eb;
+  color: #596579;
+}
+
+/* =========================================
+   MENSAJES Y ARCHIVOS
+   ========================================= */
+
+.form-error {
+  margin-top: 18px;
+  padding: 12px 14px;
+  border: 1px solid #c85c5c;
+  border-radius: 8px;
+  background: rgba(200, 70, 70, 0.12);
+  color: #ffaaaa;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.attachment-help {
+  color: #aab9ca;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.selected-file {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 11px;
+  border: 1px solid #52677e;
+  border-radius: 7px;
+  font-size: 12px;
+}
+
+.selected-file span {
+  overflow-wrap: anywhere;
+}
+
+.selected-file button {
+  flex-shrink: 0;
+  border: none;
+  background: transparent;
+  color: #edc76f;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* =========================================
+   RESPONSIVE
+   ========================================= */
 
 @media (max-width: 1050px) {
   .request-summary {
@@ -470,5 +658,190 @@
 
   .modal-actions button {
     width: 100%;
+  }
+}
+
+/* =========================================
+   ACCIONES DE SOLICITUDES
+   ========================================= */
+
+.request-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.action-button {
+  min-height: 32px;
+  padding: 7px 10px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.detail-button {
+  color: var(--text-primary, #f4f7fb);
+  background: rgba(110, 140, 170, 0.15);
+  border-color: var(--border-color, #52677e);
+}
+
+.detail-button:hover {
+  background: rgba(110, 140, 170, 0.3);
+}
+
+.review-button {
+  color: #2364b4;
+  background: #e3efff;
+}
+
+.review-button:hover {
+  background: #c9e0ff;
+}
+
+.approve-button {
+  color: #16845b;
+  background: #e0f5e9;
+}
+
+.approve-button:hover {
+  background: #c4ecd5;
+}
+
+.reject-button {
+  color: #c34747;
+  background: #ffe5e5;
+}
+
+.reject-button:hover {
+  background: #ffd0d0;
+}
+
+/* =========================================
+   DETALLE DE SOLICITUD
+   ========================================= */
+
+.detail-modal {
+  width: min(820px, 100%);
+}
+
+.detail-status {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 22px;
+  padding: 14px 16px;
+  border: 1px solid #536a82;
+  border-radius: 9px;
+  background: rgba(110, 140, 170, 0.08);
+  font-size: 13px;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 15px;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding: 13px;
+  border: 1px solid #40566e;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.025);
+  min-width: 0;
+}
+
+.detail-item > span {
+  color: #aab9ca;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.detail-item strong {
+  color: #f4f7fb;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.detail-item p {
+  margin: 0;
+  color: #e0e7ef;
+  font-size: 13px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.detail-file {
+  padding: 7px 9px;
+  border-radius: 6px;
+  background: rgba(110, 140, 170, 0.12);
+}
+
+.rejection-reason {
+  border-color: #a94d4d;
+  background: rgba(200, 70, 70, 0.08);
+}
+
+.rejection-reason > span {
+  color: #ffaaaa;
+}
+
+/* =========================================
+   MODAL DE RECHAZO
+   ========================================= */
+
+.rejection-modal {
+  width: min(620px, 100%);
+}
+
+.rejection-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 22px;
+  padding: 13px;
+  border: 1px solid #536a82;
+  border-radius: 8px;
+  background: rgba(110, 140, 170, 0.08);
+  color: #dce5ef;
+  font-size: 12px;
+}
+
+.rejection-summary strong {
+  color: #edc76f;
+}
+
+.rejection-modal .field-group textarea {
+  min-height: 115px;
+}
+
+/* =========================================
+   RESPONSIVE - ACCIONES Y DETALLES
+   ========================================= */
+
+@media (max-width: 650px) {
+  .request-actions {
+    min-width: 150px;
+  }
+
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .detail-grid .full-width {
+    grid-column: auto;
+  }
+
+  .detail-status {
+    align-items: flex-start;
+    flex-direction: column;
   }
 }

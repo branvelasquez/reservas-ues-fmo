@@ -1,7 +1,7 @@
 
 <div class="app-shell" [class.dark-theme]="isDark()">
 
-  <!-- Botón de tema para pantallas de acceso -->
+  <!-- Botón de tema -->
   @if (currentView() !== 'dashboard') {
     <button
       type="button"
@@ -38,17 +38,117 @@
     </app-recover-password>
   }
 
-  <!-- Nueva contraseña: vista previa -->
+  <!-- Nueva contraseña -->
   @if (currentView() === 'new-password') {
     <app-new-password
       (backToLogin)="showLogin()">
     </app-new-password>
   }
 
-  <!-- Panel administrativo -->
+  <!-- Selección de perfil -->
+  @if (currentView() === 'role-selection') {
+
+    <main class="role-selection-container">
+
+      <section class="role-selection-card">
+
+        <div class="role-selection-brand">
+          <div class="role-selection-logo">UES</div>
+
+          <span>UNIVERSIDAD DE EL SALVADOR</span>
+          <small>FACULTAD MULTIDISCIPLINARIA ORIENTAL</small>
+        </div>
+
+        <div class="role-selection-heading">
+          <span class="role-eyebrow">VISTA DE DEMOSTRACIÓN</span>
+
+          <h1>Seleccionar perfil</h1>
+
+          <p>
+            Elegí el perfil con el que deseas explorar
+            la plataforma institucional.
+          </p>
+        </div>
+
+        <div class="role-options">
+
+          <!-- Administrador -->
+          <button
+            type="button"
+            class="role-option"
+            (click)="selectRole('administrador')">
+
+            <span class="role-option-icon">♙</span>
+
+            <span class="role-option-content">
+              <strong>Administrador / Encargado</strong>
+              <small>
+                Gestión de solicitudes y espacios asignados.
+              </small>
+            </span>
+
+            <span class="role-option-arrow">→</span>
+          </button>
+
+          <!-- Docente -->
+          <button
+            type="button"
+            class="role-option"
+            (click)="selectRole('docente')">
+
+            <span class="role-option-icon">▤</span>
+
+            <span class="role-option-content">
+              <strong>Docente</strong>
+              <small>
+                Solicitudes y reservas académicas.
+              </small>
+            </span>
+
+            <span class="role-option-arrow">→</span>
+          </button>
+
+          <!-- Estudiante -->
+          <button
+            type="button"
+            class="role-option"
+            (click)="selectRole('estudiante')">
+
+            <span class="role-option-icon">▣</span>
+
+            <span class="role-option-content">
+              <strong>Estudiante</strong>
+              <small>
+                Solicitudes y seguimiento de reservas.
+              </small>
+            </span>
+
+            <span class="role-option-arrow">→</span>
+          </button>
+
+        </div>
+
+        <button
+          type="button"
+          class="role-back-button"
+          (click)="showLogin()">
+          ← Regresar al inicio de sesión
+        </button>
+
+        <footer class="role-selection-footer">
+          Universidad de El Salvador · FMO
+        </footer>
+
+      </section>
+
+    </main>
+  }
+
+  <!-- Dashboard según perfil -->
   @if (currentView() === 'dashboard') {
     <app-dashboard
       [isDark]="isDark()"
+      [userRole]="selectedRole()"
       (toggleThemeEvent)="toggleTheme()"
       (closeDashboard)="closeDashboardPreview()">
     </app-dashboard>

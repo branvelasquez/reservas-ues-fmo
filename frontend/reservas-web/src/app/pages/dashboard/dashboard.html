@@ -1,15 +1,16 @@
 
 <div class="dashboard-layout">
 
-  <!-- Menú lateral -->
+  <!-- MENÚ LATERAL -->
   <app-sidebar
     [items]="menuItems"
     [activeModule]="activeModule()"
+    [userRoleName]="currentRoleName"
     (moduleSelected)="selectModule($event)"
     (closeDashboard)="closeDashboardPreview()">
   </app-sidebar>
 
-  <!-- Área principal -->
+  <!-- ÁREA PRINCIPAL -->
   <main class="dashboard-main">
 
     <app-topbar
@@ -24,114 +25,220 @@
 
         <section class="welcome-section">
           <div>
-            <h1>Bienvenido al sistema</h1>
-            <p>
-              Sistema de Reserva de Laboratorios y Aulas de Cómputo
-              de la UES - Facultad Multidisciplinaria Oriental.
-            </p>
+            <span class="dashboard-role-label">
+              {{ currentRoleName }}
+            </span>
+
+            <h1>
+              @if (userRole === 'administrador') {
+                Bienvenido al panel administrativo
+              } @else if (userRole === 'docente') {
+                Bienvenido al portal docente
+              } @else {
+                Bienvenido al portal estudiantil
+              }
+            </h1>
+
+            <p>{{ currentRoleDescription }}</p>
           </div>
         </section>
 
-        <section class="dashboard-cards">
+        <!-- INICIO ADMINISTRADOR -->
+        @if (userRole === 'administrador') {
 
-          <button
-            type="button"
-            class="dashboard-card"
-            (click)="selectModule('Solicitudes')">
-            <div class="card-icon">▤</div>
-            <div class="card-content">
-              <h3>Solicitudes</h3>
-              <p>Consulta y administra las solicitudes de reserva.</p>
-            </div>
-            <span class="card-arrow">→</span>
-          </button>
+          <section class="dashboard-cards">
 
-          <button
-            type="button"
-            class="dashboard-card"
-            (click)="selectModule('Disponibilidad')">
-            <div class="card-icon">◷</div>
-            <div class="card-content">
-              <h3>Disponibilidad</h3>
-              <p>Consulta la disponibilidad de los espacios académicos.</p>
-            </div>
-            <span class="card-arrow">→</span>
-          </button>
+            <button type="button" class="dashboard-card"
+              (click)="selectModule('Solicitudes')">
+              <div class="card-icon">▤</div>
+              <div class="card-content">
+                <h3>Solicitudes</h3>
+                <p>Revisá y administrá las solicitudes de reserva.</p>
+              </div>
+              <span class="card-arrow">→</span>
+            </button>
 
-          <button
-            type="button"
-            class="dashboard-card"
-            (click)="selectModule('Calendario')">
-            <div class="card-icon">▦</div>
-            <div class="card-content">
-              <h3>Calendario</h3>
-              <p>Visualiza las reservas organizadas por fecha.</p>
-            </div>
-            <span class="card-arrow">→</span>
-          </button>
+            <button type="button" class="dashboard-card"
+              (click)="selectModule('Disponibilidad')">
+              <div class="card-icon">◷</div>
+              <div class="card-content">
+                <h3>Disponibilidad</h3>
+                <p>Consultá la disponibilidad de los espacios.</p>
+              </div>
+              <span class="card-arrow">→</span>
+            </button>
 
-          <button
-            type="button"
-            class="dashboard-card"
-            (click)="selectModule('Espacios')">
-            <div class="card-icon">▣</div>
-            <div class="card-content">
-              <h3>Espacios</h3>
-              <p>Consulta los laboratorios y aulas de cómputo.</p>
-            </div>
-            <span class="card-arrow">→</span>
-          </button>
+            <button type="button" class="dashboard-card"
+              (click)="selectModule('Calendario')">
+              <div class="card-icon">▦</div>
+              <div class="card-content">
+                <h3>Calendario</h3>
+                <p>Visualizá las reservas por fecha.</p>
+              </div>
+              <span class="card-arrow">→</span>
+            </button>
 
-          <button
-            type="button"
-            class="dashboard-card"
-            (click)="selectModule('Horarios institucionales')">
-            <div class="card-icon">◫</div>
-            <div class="card-content">
-              <h3>Horarios institucionales</h3>
-              <p>Administra los horarios de funcionamiento.</p>
-            </div>
-            <span class="card-arrow">→</span>
-          </button>
+            <button type="button" class="dashboard-card"
+              (click)="selectModule('Espacios')">
+              <div class="card-icon">▣</div>
+              <div class="card-content">
+                <h3>Espacios</h3>
+                <p>Gestioná laboratorios y aulas de cómputo.</p>
+              </div>
+              <span class="card-arrow">→</span>
+            </button>
 
-          <button
-            type="button"
-            class="dashboard-card"
-            (click)="selectModule('Reportes')">
-            <div class="card-icon purple-card-icon">▥</div>
-            <div class="card-content">
-              <h3>Reportes</h3>
-              <p>Consulta estadísticas e información sobre las solicitudes.</p>
-            </div>
-            <span class="card-arrow">→</span>
-          </button>
+            <button type="button" class="dashboard-card"
+              (click)="selectModule('Horarios institucionales')">
+              <div class="card-icon">◫</div>
+              <div class="card-content">
+                <h3>Horarios institucionales</h3>
+                <p>Administrá los horarios de funcionamiento.</p>
+              </div>
+              <span class="card-arrow">→</span>
+            </button>
 
-          <button
-            type="button"
-            class="dashboard-card"
-            (click)="selectModule('Gestión de usuarios')">
-            <div class="card-icon">♙</div>
-            <div class="card-content">
-              <h3>Gestión de usuarios</h3>
-              <p>Administra las cuentas, roles y asignaciones.</p>
-            </div>
-            <span class="card-arrow">→</span>
-          </button>
+            <button type="button" class="dashboard-card"
+              (click)="selectModule('Reportes')">
+              <div class="card-icon purple-card-icon">▥</div>
+              <div class="card-content">
+                <h3>Reportes</h3>
+                <p>Consultá estadísticas e información del sistema.</p>
+              </div>
+              <span class="card-arrow">→</span>
+            </button>
 
-        </section>
+            <button type="button" class="dashboard-card"
+              (click)="selectModule('Gestión de usuarios')">
+              <div class="card-icon">♙</div>
+              <div class="card-content">
+                <h3>Gestión de usuarios</h3>
+                <p>Administrá las cuentas y asignaciones.</p>
+              </div>
+              <span class="card-arrow">→</span>
+            </button>
+
+          </section>
+        }
+
+        <!-- INICIO DOCENTE -->
+        @else if (userRole === 'docente') {
+
+          <section class="dashboard-cards">
+
+            <button type="button" class="dashboard-card"
+              (click)="selectModule('Nueva solicitud')">
+              <div class="card-icon">＋</div>
+              <div class="card-content">
+                <h3>Nueva solicitud</h3>
+                <p>Solicitá un laboratorio o aula de cómputo.</p>
+              </div>
+              <span class="card-arrow">→</span>
+            </button>
+
+            <button type="button" class="dashboard-card"
+              (click)="selectModule('Mis solicitudes')">
+              <div class="card-icon">▤</div>
+              <div class="card-content">
+                <h3>Mis solicitudes</h3>
+                <p>Consultá el estado de tus solicitudes.</p>
+              </div>
+              <span class="card-arrow">→</span>
+            </button>
+
+            <button type="button" class="dashboard-card"
+              (click)="selectModule('Disponibilidad')">
+              <div class="card-icon">◷</div>
+              <div class="card-content">
+                <h3>Disponibilidad</h3>
+                <p>Consultá los espacios disponibles.</p>
+              </div>
+              <span class="card-arrow">→</span>
+            </button>
+
+            <button type="button" class="dashboard-card"
+              (click)="selectModule('Calendario')">
+              <div class="card-icon">▦</div>
+              <div class="card-content">
+                <h3>Calendario</h3>
+                <p>Revisá las reservas programadas.</p>
+              </div>
+              <span class="card-arrow">→</span>
+            </button>
+
+          </section>
+        }
+
+        <!-- INICIO ESTUDIANTE -->
+        @else {
+
+          <section class="dashboard-cards">
+
+            <button type="button" class="dashboard-card"
+              (click)="selectModule('Nueva solicitud')">
+              <div class="card-icon">＋</div>
+              <div class="card-content">
+                <h3>Nueva solicitud</h3>
+                <p>Solicitá un espacio académico.</p>
+              </div>
+              <span class="card-arrow">→</span>
+            </button>
+
+            <button type="button" class="dashboard-card"
+              (click)="selectModule('Mis solicitudes')">
+              <div class="card-icon">▤</div>
+              <div class="card-content">
+                <h3>Mis solicitudes</h3>
+                <p>Consultá el estado de tus reservas.</p>
+              </div>
+              <span class="card-arrow">→</span>
+            </button>
+
+            <button type="button" class="dashboard-card"
+              (click)="selectModule('Disponibilidad')">
+              <div class="card-icon">◷</div>
+              <div class="card-content">
+                <h3>Disponibilidad</h3>
+                <p>Consultá los espacios permitidos para tu carrera.</p>
+              </div>
+              <span class="card-arrow">→</span>
+            </button>
+
+            <button type="button" class="dashboard-card"
+              (click)="selectModule('Calendario')">
+              <div class="card-icon">▦</div>
+              <div class="card-content">
+                <h3>Calendario</h3>
+                <p>Visualizá las reservas programadas.</p>
+              </div>
+              <span class="card-arrow">→</span>
+            </button>
+
+          </section>
+        }
 
         <section class="dashboard-information">
           <h2>Información del sistema</h2>
           <p>
-            Desde este panel podrás acceder a los diferentes módulos
-            para gestionar las reservas de los espacios académicos.
+            Desde este panel podés acceder a las funciones
+            disponibles según tu perfil de usuario.
           </p>
         </section>
 
       }
 
-      <!-- SOLICITUDES -->
+      <!-- SOLICITUDES DEL ADMINISTRADOR -->
       @else if (activeModule() === 'Solicitudes') {
+        <app-solicitudes></app-solicitudes>
+      }
+
+      <!-- NUEVA SOLICITUD -->
+      @else if (activeModule() === 'Nueva solicitud') {
+        <app-solicitudes></app-solicitudes>
+      }
+
+      <!-- MIS SOLICITUDES -->
+      @else if (activeModule() === 'Mis solicitudes') {
         <app-solicitudes></app-solicitudes>
       }
 
@@ -146,26 +253,25 @@
       }
 
       <!-- ESPACIOS -->
-      @else if (activeModule() === 'Espacios') {
+      @else if (activeModule() === 'Espacios' && userRole === 'administrador') {
         <app-espacios></app-espacios>
       }
 
-      <!-- HORARIOS INSTITUCIONALES -->
-      @else if (activeModule() === 'Horarios institucionales') {
+      <!-- HORARIOS -->
+      @else if (activeModule() === 'Horarios institucionales' && userRole === 'administrador') {
         <app-horarios-institucionales></app-horarios-institucionales>
       }
 
       <!-- REPORTES -->
-      @else if (activeModule() === 'Reportes') {
+      @else if (activeModule() === 'Reportes' && userRole === 'administrador') {
         <app-reportes></app-reportes>
       }
 
-      <!-- GESTIÓN DE USUARIOS -->
-      @else if (activeModule() === 'Gestión de usuarios') {
+      <!-- USUARIOS -->
+      @else if (activeModule() === 'Gestión de usuarios' && userRole === 'administrador') {
         <app-usuarios></app-usuarios>
       }
 
-      <!-- MÓDULO PENDIENTE -->
       @else {
         <section class="dashboard-information">
           <h2>Módulo en preparación</h2>

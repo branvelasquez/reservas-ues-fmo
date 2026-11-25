@@ -1,14 +1,14 @@
 
 <div class="availability-page">
 
-  <!-- Encabezado del módulo -->
+  <!-- Encabezado -->
   <div class="module-header">
     <div>
       <span class="module-eyebrow">GESTIÓN DE ESPACIOS</span>
       <h1>Disponibilidad</h1>
       <p>
-        Consulta los horarios institucionales, reservas y bloqueos
-        de los espacios académicos.
+        Consultá las reservas, solicitudes en proceso y horarios
+        registrados para los espacios académicos.
       </p>
     </div>
 
@@ -86,13 +86,13 @@
 
   </section>
 
-  <!-- Referencias de disponibilidad -->
+  <!-- Referencias -->
   <section class="availability-legend-section">
 
     <div class="availability-section-heading">
       <div>
         <h2>Estados de disponibilidad</h2>
-        <p>Referencias que se utilizarán en el calendario.</p>
+        <p>Identificá la situación de cada reserva.</p>
       </div>
     </div>
 
@@ -102,7 +102,15 @@
         <span class="legend-dot available"></span>
         <div>
           <strong>Disponible</strong>
-          <small>Sin ocupación registrada</small>
+          <small>Sin solicitudes registradas</small>
+        </div>
+      </div>
+
+      <div class="legend-item">
+        <span class="legend-dot pending"></span>
+        <div>
+          <strong>En proceso</strong>
+          <small>Solicitud pendiente de revisión</small>
         </div>
       </div>
 
@@ -110,7 +118,7 @@
         <span class="legend-dot occupied"></span>
         <div>
           <strong>Ocupado</strong>
-          <small>Horario institucional o reserva aprobada</small>
+          <small>Reserva aprobada</small>
         </div>
       </div>
 
@@ -118,7 +126,7 @@
         <span class="legend-dot blocked"></span>
         <div>
           <strong>Bloqueado</strong>
-          <small>Bloqueo temporal del espacio</small>
+          <small>Restricción institucional</small>
         </div>
       </div>
 
@@ -126,18 +134,18 @@
 
   </section>
 
-  <!-- Calendario -->
+  <!-- Resultados -->
   <section class="availability-calendar-section">
 
     <div class="availability-section-heading calendar-heading">
       <div>
-        <h2>Calendario de disponibilidad</h2>
+        <h2>Resultado de la consulta</h2>
 
         <p>
           @if (espacioSeleccionado()) {
             {{ espacioSeleccionado() }}
           } @else {
-            Seleccioná un espacio para consultar su calendario.
+            Seleccioná un espacio para consultar su disponibilidad.
           }
         </p>
       </div>
@@ -155,45 +163,177 @@
 
         <p>
           Seleccioná un espacio académico y una fecha para
-          consultar su disponibilidad.
+          consultar sus reservas y solicitudes en proceso.
         </p>
 
       </div>
 
     } @else {
 
-      <div class="availability-pending-state">
+      <div class="availability-results">
 
-        <div class="pending-icon">◷</div>
+        <div class="availability-date-heading">
+          <span class="pending-label">FECHA CONSULTADA</span>
 
-        <span class="pending-label">CONSULTA PREPARADA</span>
+          <h3>{{ formatearFecha(fechaSeleccionada()) }}</h3>
 
-        <h3>{{ espacioSeleccionado() }}</h3>
+          <p>
+            Información registrada para el espacio seleccionado.
+          </p>
+        </div>
 
-        <p>
-          Fecha seleccionada: {{ fechaSeleccionada() }}
-        </p>
+        <!-- Resumen -->
+        <div class="availability-summary">
 
-        <div class="pending-information">
+          <div class="summary-card">
+            <strong>{{ reservasEnProceso().length }}</strong>
+            <span>En proceso</span>
+          </div>
 
-          <span class="information-icon">i</span>
+          <div class="summary-card">
+            <strong>{{ reservasAprobadas().length }}</strong>
+            <span>Reservas aprobadas</span>
+          </div>
 
-          <div>
-            <strong>Datos de disponibilidad pendientes</strong>
-
-            <p>
-              La consulta está preparada, pero todavía no se
-              encuentra conectada con los horarios institucionales,
-              las reservas aprobadas ni los bloqueos registrados.
-            </p>
-
-            <p>
-              Por esta razón, aún no es posible mostrar franjas
-              disponibles, ocupadas o bloqueadas.
-            </p>
+          <div class="summary-card">
+            <strong>{{ reservasDelDia().length }}</strong>
+            <span>Total de registros</span>
           </div>
 
         </div>
+
+        @if (reservasDelDia().length === 0) {
+
+          <div class="availability-empty-state">
+
+            <div class="empty-calendar-icon">✓</div>
+
+            <h3>Sin solicitudes registradas</h3>
+
+            <p>
+              No hay solicitudes pendientes ni reservas aprobadas
+              registradas para este espacio y fecha.
+            </p>
+
+            <p>
+              Recordá que también deben verificarse los horarios
+              institucionales y posibles bloqueos antes de solicitar
+              una reserva.
+            </p>
+
+          </div>
+
+        } @else {
+
+          <div class="availability-reservations">
+
+            <h3>Reservas y solicitudes registradas</h3>
+
+            @for (reserva of reservasDelDia(); track reserva.id) {
+
+              <article class="availability-reservation-card">
+
+                <div class="reservation-card-header">
+
+                  <div>
+                    <span class="reservation-id">
+                      {{ reserva.id }}
+                    </span>
+
+                    <h4>{{ reserva.tipoActividad }}</h4>
+                  </div>
+
+                  <span
+                    class="reservation-status"
+                    [ngClass]="obtenerClaseEstado(reserva)">
+
+                    {{ obtenerEstadoVisible(reserva) }}
+
+                  </span>
+
+                </div>
+
+                <div class="reservation-card-information">
+
+                  <div class="reservation-information-item">
+                    <span>Responsable</span>
+                    <strong>{{ reserva.docente }}</strong>
+                  </div>
+
+                  <div class="reservation-information-item">
+                    <span>Fecha</span>
+                    <strong>{{ formatearFecha(reserva.fecha) }}</strong>
+                  </div>
+
+                  <div class="reservation-information-item">
+                    <span>Horario</span>
+                    <strong>
+                      {{ formatearHora(reserva.horaInicio) }}
+                      -
+                      {{ formatearHora(reserva.horaFin) }}
+                    </strong>
+                  </div>
+
+                  <div class="reservation-information-item">
+                    <span>Asignatura</span>
+                    <strong>{{ reserva.asignatura }}</strong>
+                  </div>
+
+                  <div class="reservation-information-item">
+                    <span>Carrera</span>
+                    <strong>{{ reserva.carrera }}</strong>
+                  </div>
+
+                  <div class="reservation-information-item">
+                    <span>Participantes</span>
+                    <strong>{{ reserva.participantes }}</strong>
+                  </div>
+
+                </div>
+
+                <div class="reservation-reason">
+
+                  <strong>Motivo de la reserva</strong>
+
+                  <p>{{ reserva.motivo }}</p>
+
+                </div>
+
+                @if (
+                  reserva.estado === 'Pendiente de revisión' ||
+                  reserva.estado === 'En revisión'
+                ) {
+
+                  <div class="reservation-notice pending-notice">
+                    <span>◷</span>
+
+                    <p>
+                      Esta solicitud está en proceso de revisión.
+                      Se notificará al solicitante cuando sea aprobada
+                      o rechazada.
+                    </p>
+                  </div>
+
+                } @else {
+
+                  <div class="reservation-notice approved-notice">
+                    <span>✓</span>
+
+                    <p>
+                      Esta reserva ha sido aprobada y el espacio
+                      se encuentra ocupado durante el horario indicado.
+                    </p>
+                  </div>
+
+                }
+
+              </article>
+
+            }
+
+          </div>
+
+        }
 
       </div>
 
@@ -210,7 +350,7 @@
       <div>
         <h3>¿Cómo se determina la disponibilidad?</h3>
         <p>
-          El sistema deberá considerar tres fuentes de información:
+          El sistema considera las siguientes fuentes de información:
         </p>
       </div>
     </div>
@@ -227,9 +367,10 @@
 
       <div class="information-card">
         <span class="information-card-number">02</span>
-        <strong>Reservas aprobadas</strong>
+        <strong>Reservas y solicitudes</strong>
         <p>
-          Reservas registradas para el espacio y horario consultados.
+          Solicitudes pendientes y reservas aprobadas para
+          el espacio y horario consultados.
         </p>
       </div>
 

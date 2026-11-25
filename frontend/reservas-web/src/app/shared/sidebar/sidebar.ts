@@ -24,6 +24,8 @@ export class Sidebar {
 
   @Input() activeModule = 'Inicio';
 
+  @Input() userRoleName = 'Usuario';
+
   @Output() moduleSelected = new EventEmitter<string>();
 
   @Output() closeDashboard = new EventEmitter<void>();
