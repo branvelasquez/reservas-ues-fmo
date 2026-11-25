@@ -9,6 +9,8 @@ import { Disponibilidad } from '../disponibilidad/disponibilidad';
 import { Espacios } from '../espacios/espacios';
 import { Calendario } from '../calendario/calendario';
 import { HorariosInstitucionales } from '../horarios-institucionales/horarios-institucionales';
+import { ReportesComponent } from '../reportes/reportes';
+import { UsuariosComponent } from '../usuarios/usuarios';
 
 @Component({
   selector: 'app-dashboard',
@@ -20,7 +22,9 @@ import { HorariosInstitucionales } from '../horarios-institucionales/horarios-in
     Disponibilidad,
     Espacios,
     Calendario,
-    HorariosInstitucionales
+    HorariosInstitucionales,
+    ReportesComponent,
+    UsuariosComponent
   ],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css'
@@ -41,7 +45,8 @@ export class Dashboard {
     { name: 'Calendario', icon: '▦' },
     { name: 'Espacios', icon: '▣' },
     { name: 'Horarios institucionales', icon: '◫' },
-    { name: 'Reportes', icon: '▥' }
+    { name: 'Reportes', icon: '▥' },
+    { name: 'Gestión de usuarios', icon: '♙' }
   ];
 
   selectModule(module: string): void {

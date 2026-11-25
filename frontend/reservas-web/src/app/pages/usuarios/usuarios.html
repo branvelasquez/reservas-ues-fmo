@@ -1,0 +1,442 @@
+
+<div class="usuarios-container">
+
+  <!-- Encabezado -->
+  <div class="page-header">
+    <div>
+      <div class="breadcrumb">
+        <span>Panel administrativo</span>
+        <span class="breadcrumb-separator">/</span>
+        <span>Gestión de usuarios</span>
+      </div>
+
+      <h1>Gestión de usuarios</h1>
+
+      <p class="page-description">
+        Consulta y administra las cuentas, roles y asignaciones de los usuarios
+        del sistema de reservas.
+      </p>
+    </div>
+  </div>
+
+  <!-- Indicadores -->
+  <section class="stats-grid">
+
+    <article class="stat-card">
+      <div class="stat-icon icon-total">
+        <span class="material-symbols-outlined">group</span>
+      </div>
+      <div class="stat-info">
+        <span class="stat-label">Total de usuarios</span>
+        <h2>{{ totalUsuarios }}</h2>
+        <span class="stat-detail">Cuentas registradas</span>
+      </div>
+    </article>
+
+    <article class="stat-card">
+      <div class="stat-icon icon-docentes">
+        <span class="material-symbols-outlined">school</span>
+      </div>
+      <div class="stat-info">
+        <span class="stat-label">Docentes</span>
+        <h2>{{ totalDocentes }}</h2>
+        <span class="stat-detail">Usuarios docentes</span>
+      </div>
+    </article>
+
+    <article class="stat-card">
+      <div class="stat-icon icon-estudiantes">
+        <span class="material-symbols-outlined">person</span>
+      </div>
+      <div class="stat-info">
+        <span class="stat-label">Estudiantes</span>
+        <h2>{{ totalEstudiantes }}</h2>
+        <span class="stat-detail">Usuarios estudiantes</span>
+      </div>
+    </article>
+
+    <article class="stat-card">
+      <div class="stat-icon icon-encargados">
+        <span class="material-symbols-outlined">admin_panel_settings</span>
+      </div>
+      <div class="stat-info">
+        <span class="stat-label">Encargados</span>
+        <h2>{{ totalEncargados }}</h2>
+        <span class="stat-detail">Responsables de espacios</span>
+      </div>
+    </article>
+
+  </section>
+
+  <!-- Directorio de usuarios -->
+  <section class="panel usuarios-panel">
+
+    <div class="panel-heading">
+      <div>
+        <h2>Directorio de usuarios</h2>
+        <p>Consulta y administra las cuentas existentes.</p>
+      </div>
+
+      <div class="active-indicator">
+        <span class="indicator-dot"></span>
+        {{ totalActivos }} usuarios activos
+      </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="filters-container">
+
+      <div class="search-box">
+        <span class="material-symbols-outlined">search</span>
+        <input
+          type="text"
+          placeholder="Buscar por nombre o correo..."
+          [(ngModel)]="busqueda">
+      </div>
+
+      <div class="filter-select">
+        <label for="filtroRol">Rol</label>
+        <select id="filtroRol" [(ngModel)]="filtroRol">
+          <option value="Todos">Todos los roles</option>
+          <option value="Docente">Docentes</option>
+          <option value="Estudiante">Estudiantes</option>
+          <option value="Encargado">Encargados</option>
+        </select>
+      </div>
+
+      <div class="filter-select">
+        <label for="filtroEstado">Estado</label>
+        <select id="filtroEstado" [(ngModel)]="filtroEstado">
+          <option value="Todos">Todos los estados</option>
+          <option value="Activo">Activos</option>
+          <option value="Inactivo">Inactivos</option>
+        </select>
+      </div>
+
+      <button class="btn-clear" (click)="limpiarFiltros()">
+        <span class="material-symbols-outlined">restart_alt</span>
+        Limpiar
+      </button>
+
+    </div>
+
+    <!-- Tabla -->
+    <div class="table-responsive">
+
+      <table class="users-table">
+        <thead>
+          <tr>
+            <th>USUARIO</th>
+            <th>ROL</th>
+            <th>CARRERA / ÁREA</th>
+            <th>ESPACIOS ASIGNADOS</th>
+            <th>ESTADO</th>
+            <th>ACCIONES</th>
+          </tr>
+        </thead>
+
+        <tbody>
+
+          <tr *ngFor="let usuario of usuariosFiltrados">
+
+            <td>
+              <div class="user-cell">
+                <div class="user-avatar">
+                  {{ usuario.nombre.charAt(0).toUpperCase() }}
+                </div>
+
+                <div class="user-information">
+                  <strong>{{ usuario.nombre }}</strong>
+                  <span>{{ usuario.correo }}</span>
+                </div>
+              </div>
+            </td>
+
+            <td>
+              <span
+                class="role-badge"
+                [ngClass]="obtenerClaseRol(usuario.rol)">
+                {{ usuario.rol }}
+              </span>
+            </td>
+
+            <td>{{ usuario.carreraArea }}</td>
+
+            <td>
+              <span *ngIf="usuario.rol === 'Encargado'">
+                {{ usuario.espaciosAsignados.length }} espacio(s)
+              </span>
+
+              <span
+                *ngIf="usuario.rol !== 'Encargado'"
+                class="not-applicable">
+                No aplica
+              </span>
+            </td>
+
+            <td>
+              <span
+                class="status-badge"
+                [class.status-active]="usuario.estado === 'Activo'"
+                [class.status-inactive]="usuario.estado === 'Inactivo'">
+                {{ usuario.estado }}
+              </span>
+            </td>
+
+            <td>
+              <div class="action-buttons">
+
+                <button
+                  class="btn-action btn-edit"
+                  title="Editar usuario"
+                  (click)="editarUsuario(usuario)">
+                  <span class="material-symbols-outlined">edit</span>
+                </button>
+
+                <button
+                  class="btn-action"
+                  [class.btn-disable]="usuario.estado === 'Activo'"
+                  [class.btn-enable]="usuario.estado === 'Inactivo'"
+                  [title]="usuario.estado === 'Activo' ? 'Desactivar cuenta' : 'Activar cuenta'"
+                  (click)="cambiarEstado(usuario)">
+                  <span class="material-symbols-outlined">
+                    {{ usuario.estado === 'Activo' ? 'person_off' : 'person_check' }}
+                  </span>
+                </button>
+
+              </div>
+            </td>
+
+          </tr>
+
+          <!-- Estado vacío -->
+          <tr *ngIf="usuariosFiltrados.length === 0">
+            <td colspan="6">
+              <div class="empty-state">
+
+                <div class="empty-icon">
+                  <span class="material-symbols-outlined">group_off</span>
+                </div>
+
+                <h3>
+                  {{ usuarios.length === 0
+                    ? 'No hay usuarios registrados'
+                    : 'No se encontraron usuarios' }}
+                </h3>
+
+                <p>
+                  {{ usuarios.length === 0
+                    ? 'Las cuentas institucionales aparecerán aquí cuando estén disponibles en el sistema.'
+                    : 'Probá modificando los filtros de búsqueda.' }}
+                </p>
+
+              </div>
+            </td>
+          </tr>
+
+        </tbody>
+      </table>
+
+    </div>
+
+    <!-- Pie de tabla -->
+    <div class="table-footer">
+      <span>
+        Mostrando {{ usuariosFiltrados.length }} de {{ totalUsuarios }} usuarios
+      </span>
+
+      <span class="footer-note">
+        Gestión de cuentas institucionales
+      </span>
+    </div>
+
+  </section>
+
+  <!-- Modal únicamente para editar -->
+  <div
+    class="modal-overlay"
+    *ngIf="mostrarFormulario"
+    (click)="cerrarFormulario()">
+
+    <section
+      class="user-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modalTitle"
+      (click)="$event.stopPropagation()">
+
+      <div class="modal-header">
+        <div>
+          <span class="modal-subtitle">Administración de cuentas</span>
+
+          <h2 id="modalTitle">Editar usuario</h2>
+
+          <p>Modificá la información de la cuenta seleccionada.</p>
+        </div>
+
+        <button
+          type="button"
+          class="modal-close"
+          (click)="cerrarFormulario()"
+          aria-label="Cerrar formulario">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+
+      <form (ngSubmit)="guardarUsuario()">
+
+        <div class="modal-body">
+
+          <div class="form-section-title">
+            <span class="material-symbols-outlined">person</span>
+            Información del usuario
+          </div>
+
+          <div class="form-grid">
+
+            <div class="form-group full-width">
+              <label for="nombreUsuario">Nombre completo *</label>
+              <input
+                id="nombreUsuario"
+                type="text"
+                name="nombreUsuario"
+                [(ngModel)]="formulario.nombre"
+                placeholder="Nombre y apellidos"
+                required>
+            </div>
+
+            <div class="form-group full-width">
+              <label for="correoUsuario">Correo institucional *</label>
+              <input
+                id="correoUsuario"
+                type="email"
+                name="correoUsuario"
+                [(ngModel)]="formulario.correo"
+                placeholder="usuario@ues.edu.sv"
+                required>
+            </div>
+
+            <div class="form-group">
+              <label for="rolUsuario">Rol del usuario</label>
+              <select
+                id="rolUsuario"
+                name="rolUsuario"
+                [(ngModel)]="formulario.rol"
+                disabled>
+                <option value="Docente">Docente</option>
+                <option value="Estudiante">Estudiante</option>
+                <option value="Encargado">Encargado</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="carreraArea">
+                {{ formulario.rol === 'Estudiante'
+                  ? 'Carrera *'
+                  : formulario.rol === 'Docente'
+                    ? 'Área académica *'
+                    : 'Área o unidad *' }}
+              </label>
+
+              <input
+                id="carreraArea"
+                type="text"
+                name="carreraArea"
+                [(ngModel)]="formulario.carreraArea"
+                placeholder="Carrera o área correspondiente"
+                required>
+            </div>
+
+          </div>
+
+          <!-- Espacios asignados a encargados -->
+          <div
+            class="assignment-section"
+            *ngIf="formulario.rol === 'Encargado'">
+
+            <div class="form-section-title">
+              <span class="material-symbols-outlined">meeting_room</span>
+              Espacios bajo su responsabilidad
+            </div>
+
+            <p class="assignment-description">
+              Seleccioná los espacios que podrá administrar este encargado.
+            </p>
+
+            <div class="spaces-grid">
+
+              <label
+                class="space-option"
+                *ngFor="let espacio of espaciosDisponibles">
+
+                <input
+                  type="checkbox"
+                  [checked]="espacioSeleccionado(espacio)"
+                  (change)="actualizarEspacio(
+                    espacio,
+                    $any($event.target).checked
+                  )">
+
+                <span>{{ espacio }}</span>
+
+              </label>
+
+            </div>
+
+          </div>
+
+          <!-- Estado de la cuenta -->
+          <div class="form-group status-field">
+            <label for="estadoUsuario">Estado de la cuenta *</label>
+
+            <select
+              id="estadoUsuario"
+              name="estadoUsuario"
+              [(ngModel)]="formulario.estado">
+              <option value="Activo">Activo</option>
+              <option value="Inactivo">Inactivo</option>
+            </select>
+          </div>
+
+          <div class="form-error" *ngIf="mensajeError">
+            <span class="material-symbols-outlined">error</span>
+            {{ mensajeError }}
+          </div>
+
+          <div class="form-notice">
+            <span class="material-symbols-outlined">info</span>
+            <p>
+              Los cambios de esta versión son temporales y todavía no
+              se guardan en la base de datos.
+            </p>
+          </div>
+
+        </div>
+
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn-secondary"
+            (click)="cerrarFormulario()">
+            Cancelar
+          </button>
+
+          <button type="submit" class="btn-primary">
+            <span class="material-symbols-outlined">save</span>
+            Guardar cambios
+          </button>
+        </div>
+
+      </form>
+
+    </section>
+
+  </div>
+
+  <!-- Pie -->
+  <div class="report-footer">
+    <span>Sistema de Reserva de Laboratorios y Aulas de Cómputo</span>
+    <span>UES - Facultad Multidisciplinaria Oriental</span>
+  </div>
+
+</div>

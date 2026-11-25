@@ -1,0 +1,349 @@
+
+<div class="reportes-container">
+
+  <!-- Encabezado -->
+  <div class="page-header">
+    <div>
+      <div class="breadcrumb">
+        <span>Panel administrativo</span>
+        <span class="breadcrumb-separator">/</span>
+        <span>Reportes</span>
+      </div>
+
+      <h1>Reportes y estadísticas</h1>
+
+      <p class="page-description">
+        Consulta y analiza la información de las solicitudes de reserva
+        de laboratorios y aulas de cómputo.
+      </p>
+    </div>
+
+    <button class="btn-exportar" (click)="exportarPDF()">
+      <span class="material-symbols-outlined">picture_as_pdf</span>
+      Exportar PDF
+    </button>
+  </div>
+
+  <!-- Aviso de demostración -->
+  <div class="demo-notice">
+    <span class="material-symbols-outlined">info</span>
+    <div>
+      <strong>Datos de demostración</strong>
+      <p>
+        La información presentada es de prueba y todavía no está
+        conectada con la base de datos.
+      </p>
+    </div>
+  </div>
+
+  <!-- Indicadores -->
+  <section class="stats-grid">
+
+    <article class="stat-card">
+      <div class="stat-icon icon-total">
+        <span class="material-symbols-outlined">description</span>
+      </div>
+
+      <div class="stat-info">
+        <span class="stat-label">Total de solicitudes</span>
+        <h2>{{ totalSolicitudes }}</h2>
+        <span class="stat-detail">Según los filtros aplicados</span>
+      </div>
+    </article>
+
+    <article class="stat-card">
+      <div class="stat-icon icon-aprobadas">
+        <span class="material-symbols-outlined">check_circle</span>
+      </div>
+
+      <div class="stat-info">
+        <span class="stat-label">Aprobadas</span>
+        <h2>{{ totalAprobadas }}</h2>
+        <span class="stat-detail">Reservas autorizadas</span>
+      </div>
+    </article>
+
+    <article class="stat-card">
+      <div class="stat-icon icon-pendientes">
+        <span class="material-symbols-outlined">schedule</span>
+      </div>
+
+      <div class="stat-info">
+        <span class="stat-label">Pendientes</span>
+        <h2>{{ totalPendientes }}</h2>
+        <span class="stat-detail">En espera de revisión</span>
+      </div>
+    </article>
+
+    <article class="stat-card">
+      <div class="stat-icon icon-rechazadas">
+        <span class="material-symbols-outlined">cancel</span>
+      </div>
+
+      <div class="stat-info">
+        <span class="stat-label">Rechazadas</span>
+        <h2>{{ totalRechazadas }}</h2>
+        <span class="stat-detail">Solicitudes no autorizadas</span>
+      </div>
+    </article>
+
+  </section>
+
+  <!-- Filtros -->
+  <section class="panel filtros-panel">
+
+    <div class="panel-heading">
+      <div>
+        <h2>Filtros de consulta</h2>
+        <p>Personaliza la información que deseas visualizar.</p>
+      </div>
+
+      <span class="material-symbols-outlined heading-icon">
+        filter_alt
+      </span>
+    </div>
+
+    <div class="filtros-grid">
+
+      <div class="form-group">
+        <label for="fechaInicio">Fecha inicial</label>
+        <input
+          id="fechaInicio"
+          type="date"
+          [(ngModel)]="fechaInicio">
+      </div>
+
+      <div class="form-group">
+        <label for="fechaFin">Fecha final</label>
+        <input
+          id="fechaFin"
+          type="date"
+          [(ngModel)]="fechaFin">
+      </div>
+
+      <div class="form-group">
+        <label for="espacio">Espacio académico</label>
+        <select id="espacio" [(ngModel)]="espacioSeleccionado">
+          <option value="Todos">Todos los espacios</option>
+          <option *ngFor="let espacio of espacios" [value]="espacio">
+            {{ espacio }}
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="estado">Estado de solicitud</label>
+        <select id="estado" [(ngModel)]="estadoSeleccionado">
+          <option value="Todos">Todos los estados</option>
+          <option value="Aprobada">Aprobadas</option>
+          <option value="Pendiente">Pendientes</option>
+          <option value="Rechazada">Rechazadas</option>
+        </select>
+      </div>
+
+    </div>
+
+    <div class="filter-actions">
+      <button class="btn-limpiar" (click)="limpiarFiltros()">
+        <span class="material-symbols-outlined">restart_alt</span>
+        Limpiar filtros
+      </button>
+
+      <span class="results-count">
+        {{ totalSolicitudes }} resultados encontrados
+      </span>
+    </div>
+
+  </section>
+
+  <!-- Estadísticas -->
+  <section class="analytics-grid">
+
+    <!-- Gráfica -->
+    <article class="panel chart-panel">
+      <div class="panel-heading">
+        <div>
+          <h2>Reservas por espacio</h2>
+          <p>Distribución de solicitudes según el espacio académico.</p>
+        </div>
+
+        <span class="material-symbols-outlined heading-icon">
+          bar_chart
+        </span>
+      </div>
+
+      <div class="chart-content" *ngIf="datosPorEspacio.length > 0; else sinDatosGrafica">
+
+        <div class="chart-item" *ngFor="let item of datosPorEspacio">
+
+          <div class="chart-label">
+            <span>{{ obtenerNombreCorto(item.espacio) }}</span>
+            <strong>{{ item.cantidad }}</strong>
+          </div>
+
+          <div class="chart-track">
+            <div
+              class="chart-bar"
+              [style.width.%]="item.porcentaje">
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <ng-template #sinDatosGrafica>
+        <div class="empty-state">
+          <span class="material-symbols-outlined">bar_chart</span>
+          <p>No hay datos para mostrar.</p>
+        </div>
+      </ng-template>
+
+    </article>
+
+    <!-- Resumen -->
+    <article class="panel summary-panel">
+      <div class="panel-heading">
+        <div>
+          <h2>Resumen general</h2>
+          <p>Estado de las solicitudes consultadas.</p>
+        </div>
+
+        <span class="material-symbols-outlined heading-icon">
+          analytics
+        </span>
+      </div>
+
+      <div class="approval-summary">
+        <div class="approval-percentage">
+          {{ porcentajeAprobadas }}%
+        </div>
+
+        <p>Porcentaje de solicitudes aprobadas</p>
+
+        <div class="progress-track">
+          <div
+            class="progress-bar"
+            [style.width.%]="porcentajeAprobadas">
+          </div>
+        </div>
+      </div>
+
+      <div class="summary-list">
+
+        <div class="summary-item">
+          <span class="summary-dot dot-approved"></span>
+          <span>Aprobadas</span>
+          <strong>{{ totalAprobadas }}</strong>
+        </div>
+
+        <div class="summary-item">
+          <span class="summary-dot dot-pending"></span>
+          <span>Pendientes</span>
+          <strong>{{ totalPendientes }}</strong>
+        </div>
+
+        <div class="summary-item">
+          <span class="summary-dot dot-rejected"></span>
+          <span>Rechazadas</span>
+          <strong>{{ totalRechazadas }}</strong>
+        </div>
+
+      </div>
+    </article>
+
+  </section>
+
+  <!-- Tabla -->
+  <section class="panel table-panel">
+
+    <div class="panel-heading table-heading">
+      <div>
+        <h2>Detalle de solicitudes</h2>
+        <p>Listado de solicitudes según los criterios seleccionados.</p>
+      </div>
+
+      <span class="material-symbols-outlined heading-icon">
+        table_view
+      </span>
+    </div>
+
+    <div class="table-responsive">
+
+      <table>
+        <thead>
+          <tr>
+            <th>CÓDIGO</th>
+            <th>ESPACIO</th>
+            <th>SOLICITANTE</th>
+            <th>ACTIVIDAD</th>
+            <th>FECHA</th>
+            <th>HORARIO</th>
+            <th>ESTADO</th>
+          </tr>
+        </thead>
+
+        <tbody>
+
+          <tr *ngFor="let solicitud of solicitudesFiltradas">
+
+            <td class="codigo-cell">
+              {{ solicitud.codigo }}
+            </td>
+
+            <td>{{ solicitud.espacio }}</td>
+
+            <td>{{ solicitud.solicitante }}</td>
+
+            <td>{{ solicitud.actividad }}</td>
+
+            <td>{{ solicitud.fecha | date:'dd/MM/yyyy' }}</td>
+
+            <td>
+              {{ solicitud.horaInicio }} - {{ solicitud.horaFin }}
+            </td>
+
+            <td>
+              <span
+                class="status-badge"
+                [ngClass]="obtenerClaseEstado(solicitud.estado)">
+                {{ solicitud.estado }}
+              </span>
+            </td>
+
+          </tr>
+
+          <tr *ngIf="solicitudesFiltradas.length === 0">
+            <td colspan="7">
+              <div class="empty-table">
+                <span class="material-symbols-outlined">search_off</span>
+                <strong>No se encontraron solicitudes</strong>
+                <p>Probá modificando los filtros de consulta.</p>
+              </div>
+            </td>
+          </tr>
+
+        </tbody>
+      </table>
+
+    </div>
+
+    <div class="table-footer">
+      <span>
+        Mostrando {{ solicitudesFiltradas.length }} solicitudes
+      </span>
+
+      <span class="demo-label">
+        Información de demostración
+      </span>
+    </div>
+
+  </section>
+
+  <!-- Pie -->
+  <div class="report-footer">
+    <span>Sistema de Reserva de Laboratorios y Aulas de Cómputo</span>
+    <span>UES - Facultad Multidisciplinaria Oriental</span>
+  </div>
+
+</div>

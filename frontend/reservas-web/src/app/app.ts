@@ -4,8 +4,15 @@ import { Component, signal } from '@angular/core';
 import { Login } from './pages/login/login';
 import { AccessRequest } from './pages/access-request/access-request';
 import { Dashboard } from './pages/dashboard/dashboard';
+import { RecoverPassword } from './pages/recover-password/recover-password';
+import { NewPassword } from './pages/new-password/new-password';
 
-type View = 'login' | 'request' | 'dashboard';
+type View =
+  | 'login'
+  | 'request'
+  | 'recover'
+  | 'new-password'
+  | 'dashboard';
 
 @Component({
   selector: 'app-root',
@@ -13,7 +20,9 @@ type View = 'login' | 'request' | 'dashboard';
   imports: [
     Login,
     AccessRequest,
-    Dashboard
+    Dashboard,
+    RecoverPassword,
+    NewPassword
   ],
   templateUrl: './app.html',
   styleUrl: './app.css'
@@ -34,6 +43,14 @@ export class App {
 
   showLogin(): void {
     this.currentView.set('login');
+  }
+
+  showRecoverPassword(): void {
+    this.currentView.set('recover');
+  }
+
+  showNewPasswordPreview(): void {
+    this.currentView.set('new-password');
   }
 
   openDashboardPreview(): void {

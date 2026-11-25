@@ -14,6 +14,8 @@ export class Login {
 
   @Output() previewDashboard = new EventEmitter<void>();
 
+  @Output() forgotPassword = new EventEmitter<void>();
+
   protected readonly showPassword = signal(false);
   protected readonly message = signal('');
 
@@ -31,6 +33,10 @@ export class Login {
 
   showAccessRequest(): void {
     this.requestAccess.emit();
+  }
+
+  openForgotPassword(): void {
+    this.forgotPassword.emit();
   }
 
   openDashboardPreview(): void {

@@ -1,7 +1,7 @@
 
 <div class="app-shell" [class.dark-theme]="isDark()">
 
-  <!-- Botón de tema para las pantallas de acceso -->
+  <!-- Botón de tema para pantallas de acceso -->
   @if (currentView() !== 'dashboard') {
     <button
       type="button"
@@ -18,7 +18,8 @@
   @if (currentView() === 'login') {
     <app-login
       (requestAccess)="showAccessRequest()"
-      (previewDashboard)="openDashboardPreview()">
+      (previewDashboard)="openDashboardPreview()"
+      (forgotPassword)="showRecoverPassword()">
     </app-login>
   }
 
@@ -27,6 +28,21 @@
     <app-access-request
       (backToLogin)="showLogin()">
     </app-access-request>
+  }
+
+  <!-- Recuperación de contraseña -->
+  @if (currentView() === 'recover') {
+    <app-recover-password
+      (backToLogin)="showLogin()"
+      (previewNewPassword)="showNewPasswordPreview()">
+    </app-recover-password>
+  }
+
+  <!-- Nueva contraseña: vista previa -->
+  @if (currentView() === 'new-password') {
+    <app-new-password
+      (backToLogin)="showLogin()">
+    </app-new-password>
   }
 
   <!-- Panel administrativo -->
