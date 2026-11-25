@@ -39,3 +39,6 @@ desktop.ini
 *.tmp
 *.bak
 *.swp
+
+# SQL anterior de respaldo
+reservas_ues_fmo_anterior.sql
