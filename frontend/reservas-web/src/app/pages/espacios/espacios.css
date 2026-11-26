@@ -490,3 +490,528 @@
     font-size: 23px;
   }
 }
+
+/* ==========================================
+   INFORMACIÓN OPERATIVA DE LOS ESPACIOS
+========================================== */
+
+.space-operational-status {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 13px 0;
+  border-top: 1px solid var(--border-color);
+}
+
+.space-operational-status > small {
+  color: var(--text-secondary);
+  font-size: 10px;
+  font-weight: 650;
+}
+
+.operational-badge {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 7px;
+  padding: 6px 10px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.status-dot {
+  width: 7px;
+  height: 7px;
+  flex-shrink: 0;
+  border-radius: 50%;
+}
+
+.status-available {
+  background: rgba(48, 170, 112, 0.12);
+  color: #299765;
+}
+
+.status-available .status-dot {
+  background: #299765;
+}
+
+.status-maintenance {
+  background: rgba(214, 158, 53, 0.14);
+  color: #b58220;
+}
+
+.status-maintenance .status-dot {
+  background: #c18c24;
+}
+
+.status-out {
+  background: rgba(210, 70, 70, 0.12);
+  color: #c34444;
+}
+
+.status-out .status-dot {
+  background: #c34444;
+}
+
+.status-pending {
+  background: rgba(120, 130, 145, 0.13);
+  color: var(--text-secondary);
+}
+
+.status-pending .status-dot {
+  background: #929ba8;
+}
+
+/* ==========================================
+   EQUIPAMIENTO E INCIDENCIAS
+========================================== */
+
+.space-extra-info {
+  padding: 13px 0;
+  border-top: 1px solid var(--border-color);
+}
+
+.extra-info-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 11px;
+}
+
+.extra-info-heading strong {
+  color: var(--text-primary);
+  font-size: 11px;
+  font-weight: 750;
+}
+
+.extra-info-heading > span {
+  padding: 4px 7px;
+  border-radius: 12px;
+  background: var(--background-color);
+  color: var(--text-secondary);
+  font-size: 9px;
+  font-weight: 650;
+}
+
+.pending-information {
+  margin: 0;
+  padding: 10px;
+  border: 1px dashed var(--border-color);
+  border-radius: 7px;
+  color: var(--text-secondary);
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.equipment-list,
+.incident-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.equipment-item,
+.incident-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  padding: 9px;
+  border-radius: 8px;
+  background: var(--background-color);
+}
+
+.equipment-item > div,
+.incident-item {
+  min-width: 0;
+}
+
+.equipment-item > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.equipment-item strong,
+.incident-item strong {
+  color: var(--text-primary);
+  font-size: 10px;
+  font-weight: 650;
+  overflow-wrap: anywhere;
+}
+
+.equipment-item small,
+.incident-item small {
+  color: var(--text-secondary);
+  font-size: 9px;
+}
+
+.equipment-item > span {
+  flex-shrink: 0;
+  color: var(--text-secondary);
+  font-size: 9px;
+  font-weight: 650;
+}
+
+.incident-item {
+  align-items: flex-start;
+  flex-direction: column;
+}
+
+/* ==========================================
+   AJUSTES PARA TARJETAS MÁS COMPLETAS
+========================================== */
+
+.espacio-card {
+  height: 100%;
+}
+
+.espacio-card-footer {
+  margin-top: auto;
+}
+
+/* ==========================================
+   MODO RESPONSIVO
+========================================== */
+
+@media (max-width: 700px) {
+  .space-operational-status,
+  .space-extra-info {
+    padding-top: 12px;
+    padding-bottom: 12px;
+  }
+
+  .equipment-item,
+  .incident-item {
+    padding: 10px;
+  }
+}
+
+/* BOTÓN GESTIONAR ESPACIO */
+
+.espacio-card-footer {
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.manage-space-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 12px;
+  border: 1px solid rgba(41, 105, 180, 0.25);
+  border-radius: 7px;
+  background: rgba(41, 105, 180, 0.08);
+  color: var(--primary-color, #1d4e89);
+  font-family: inherit;
+  font-size: 10px;
+  font-weight: 750;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.manage-space-btn:hover {
+  background: var(--primary-color, #1d4e89);
+  color: white;
+}
+
+.manage-space-btn span {
+  font-size: 15px;
+}
+
+/* VENTANA MODAL */
+
+.management-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  background: rgba(9, 20, 38, 0.65);
+  backdrop-filter: blur(4px);
+}
+
+.management-modal {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  width: min(760px, 100%);
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 25px;
+  border: 1px solid var(--border-color);
+  border-radius: 15px;
+  background: var(--surface-color);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+}
+
+.management-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 15px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.management-header h2 {
+  margin: 4px 0;
+  color: var(--text-primary);
+  font-size: 22px;
+}
+
+.management-header p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+.modal-close-btn {
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--background-color);
+  color: var(--text-primary);
+  font-size: 22px;
+  cursor: pointer;
+}
+
+/* SECCIONES */
+
+.management-section {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.management-section-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.section-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border-radius: 9px;
+  background: rgba(41, 105, 180, 0.12);
+  color: var(--primary-color, #1d4e89);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.management-section-heading h3 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 14px;
+}
+
+.management-section-heading p {
+  margin: 4px 0 0;
+  color: var(--text-secondary);
+  font-size: 11px;
+}
+
+/* FORMULARIOS */
+
+.management-form-grid,
+.inline-management-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.management-field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 0;
+}
+
+.management-field > span {
+  color: var(--text-secondary);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.management-field input,
+.management-field select,
+.management-record select {
+  width: 100%;
+  min-width: 0;
+  height: 40px;
+  padding: 0 11px;
+  border: 1px solid var(--border-color);
+  border-radius: 7px;
+  outline: none;
+  background: var(--background-color);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 12px;
+}
+
+.management-field input:focus,
+.management-field select:focus,
+.management-record select:focus {
+  border-color: var(--primary-color, #1d4e89);
+}
+
+.full-field {
+  grid-column: 1 / -1;
+}
+
+.management-actions {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  flex-wrap: wrap;
+  grid-column: 1 / -1;
+}
+
+.save-space-btn,
+.add-record-btn,
+.cancel-record-btn,
+.delete-record-btn {
+  min-height: 37px;
+  padding: 0 13px;
+  border-radius: 7px;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.save-space-btn {
+  border: 1px solid var(--primary-color, #1d4e89);
+  background: var(--primary-color, #1d4e89);
+  color: white;
+}
+
+.save-space-btn:hover {
+  filter: brightness(1.12);
+}
+
+.add-record-btn {
+  align-self: flex-start;
+  border: 1px dashed var(--primary-color, #1d4e89);
+  background: rgba(41, 105, 180, 0.06);
+  color: var(--primary-color, #1d4e89);
+}
+
+.add-record-btn:hover {
+  background: rgba(41, 105, 180, 0.14);
+}
+
+.cancel-record-btn {
+  border: 1px solid var(--border-color);
+  background: var(--surface-color);
+  color: var(--text-secondary);
+}
+
+.delete-record-btn {
+  min-height: 30px;
+  border: 1px solid rgba(200, 65, 65, 0.25);
+  background: rgba(200, 65, 65, 0.08);
+  color: #c34444;
+}
+
+/* REGISTROS */
+
+.management-record-list {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.management-record {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--background-color);
+}
+
+.management-record > div {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.management-record strong {
+  color: var(--text-primary);
+  font-size: 11px;
+  overflow-wrap: anywhere;
+}
+
+.management-record small {
+  color: var(--text-secondary);
+  font-size: 10px;
+}
+
+.management-record select {
+  width: auto;
+  max-width: 150px;
+}
+
+/* PIE DE VENTANA */
+
+.management-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding-top: 5px;
+}
+
+.management-footer > span {
+  color: var(--text-secondary);
+  font-size: 10px;
+}
+
+@media (max-width: 600px) {
+  .management-overlay {
+    padding: 8px;
+  }
+
+  .management-modal {
+    padding: 17px;
+    max-height: 95vh;
+  }
+
+  .management-form-grid,
+  .inline-management-form {
+    grid-template-columns: 1fr;
+  }
+
+  .full-field,
+  .management-actions {
+    grid-column: auto;
+  }
+
+  .management-record {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .management-footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

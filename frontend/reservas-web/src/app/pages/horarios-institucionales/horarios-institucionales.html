@@ -1,3 +1,4 @@
+
 <div class="horarios-page">
 
   @if (!espacioSeleccionado()) {
@@ -239,7 +240,7 @@
                     <td class="time-cell">
                       {{ horario.horaInicio }} - {{ horario.horaFin }}
                     </td>
-                    <td>{{ horario.periodo }}</td>
+                    <td>{{ obtenerPeriodo(horario) }}</td>
                     <td>
                       <button
                         type="button"
@@ -280,6 +281,18 @@
             <p>Revisá las solicitudes enviadas por los docentes para este espacio.</p>
           </div>
         </div>
+
+        @if (mensajeValidacion()) {
+          <div
+            class="validation-message"
+            [class.error]="tipoMensaje() === 'error'"
+            [class.success]="tipoMensaje() === 'exito'">
+            <strong>
+              {{ tipoMensaje() === 'error' ? '⚠ Conflicto o error detectado' : '✓ Operación correcta' }}
+            </strong>
+            <p>{{ mensajeValidacion() }}</p>
+          </div>
+        }
 
         @if (solicitudesDelEspacio().length > 0) {
           <div class="requests-list">
@@ -422,6 +435,18 @@
             </button>
           </div>
 
+          @if (mensajeValidacion()) {
+            <div
+              class="validation-message"
+              [class.error]="tipoMensaje() === 'error'"
+              [class.success]="tipoMensaje() === 'exito'">
+              <strong>
+                {{ tipoMensaje() === 'error' ? '⚠ Conflicto o error detectado' : '✓ Operación correcta' }}
+              </strong>
+              <p>{{ mensajeValidacion() }}</p>
+            </div>
+          }
+
           <form (ngSubmit)="registrarHorario($event)">
             <div class="form-grid">
               <label class="full-field">
@@ -463,13 +488,27 @@
               </label>
 
               <label>
-                Período académico
-                <input
-                  type="text"
-                  name="periodo"
-                  [(ngModel)]="nuevoHorario.periodo"
-                  placeholder="Ej. Ciclo II - 2026"
+                Ciclo académico
+                <select
+                  name="ciclo"
+                  [(ngModel)]="nuevoHorario.ciclo"
                   required>
+                  @for (ciclo of ciclos; track ciclo) {
+                    <option [value]="ciclo">Ciclo {{ ciclo }}</option>
+                  }
+                </select>
+              </label>
+
+              <label>
+                Año académico
+                <select
+                  name="anio"
+                  [(ngModel)]="nuevoHorario.anio"
+                  required>
+                  @for (anio of aniosDisponibles; track anio) {
+                    <option [value]="anio">{{ anio }}</option>
+                  }
+                </select>
               </label>
 
               <label>
@@ -493,7 +532,9 @@
 
             <p class="form-note">
               El horario se registrará únicamente dentro de este espacio.
-              Esta demostración todavía no valida cruces con otros horarios.
+              El sistema validará que no existan cruces con otros horarios
+              del mismo ciclo académico y año, y que se respeten los horarios
+              institucionales establecidos.
             </p>
 
             <div class="modal-actions">

@@ -1,4 +1,5 @@
-import { Component, computed, signal } from '@angular/core';
+
+import { Component, computed, effect, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 type Dia =
@@ -8,6 +9,8 @@ type Dia =
   | 'Jueves'
   | 'Viernes'
   | 'Sábado';
+
+type CicloAcademico = 'I' | 'II' | 'III' | 'IV';
 
 type EstadoSolicitud =
   | 'Pendiente de revisión'
@@ -32,7 +35,8 @@ interface Horario {
   dia: Dia;
   horaInicio: string;
   horaFin: string;
-  periodo: string;
+  ciclo: CicloAcademico;
+  anio: number;
 }
 
 interface SolicitudCambio {
@@ -69,13 +73,15 @@ interface Movimiento {
 })
 export class HorariosInstitucionales {
 
+  private readonly storageKey = 'ues_fmo_horarios_institucionales';
+
   protected readonly espacios: Espacio[] = [
     {
       id: 1,
       codigo: 'LAB-001',
       nombre: 'Laboratorio de Física',
       tipo: 'Laboratorio',
-      ubicacion: 'Por confirmar',
+      ubicacion: 'Departamento de Física',
       encargado: 'Encargado del laboratorio'
     },
     {
@@ -83,7 +89,7 @@ export class HorariosInstitucionales {
       codigo: 'LAB-002',
       nombre: 'Laboratorio de Química',
       tipo: 'Laboratorio',
-      ubicacion: 'Por confirmar',
+      ubicacion: 'Departamento de Medicina',
       encargado: 'Encargado del laboratorio'
     },
     {
@@ -91,7 +97,7 @@ export class HorariosInstitucionales {
       codigo: 'LAB-003',
       nombre: 'Laboratorio de Industrial',
       tipo: 'Laboratorio',
-      ubicacion: 'Por confirmar',
+      ubicacion: 'Departamento de Ingeniería y Arquitectura',
       encargado: 'Encargado del laboratorio'
     },
     {
@@ -99,7 +105,7 @@ export class HorariosInstitucionales {
       codigo: 'LAB-004',
       nombre: 'Laboratorio de Biología',
       tipo: 'Laboratorio',
-      ubicacion: 'Por confirmar',
+      ubicacion: 'Departamento de Física',
       encargado: 'Encargado del laboratorio'
     },
     {
@@ -107,7 +113,7 @@ export class HorariosInstitucionales {
       codigo: 'LAB-005',
       nombre: 'Laboratorio de Realidad Virtual',
       tipo: 'Laboratorio',
-      ubicacion: 'Por confirmar',
+      ubicacion: 'Biblioteca',
       encargado: 'Ing. Astrid · Coordinadora de carrera'
     },
     {
@@ -136,15 +142,20 @@ export class HorariosInstitucionales {
     }
   ];
 
-  protected readonly horarios = signal<Horario[]>([]);
-  protected readonly solicitudes = signal<SolicitudCambio[]>([]);
-  protected readonly historial = signal<Movimiento[]>([]);
+  protected readonly ciclos: CicloAcademico[] = [
+    'I',
+    'II',
+    'III',
+    'IV'
+  ];
 
-  protected readonly espacioSeleccionado = signal<Espacio | null>(null);
-  protected readonly vistaActiva = signal<'horarios' | 'solicitudes' | 'historial'>('horarios');
-
-  protected readonly mostrarFormularioHorario = signal(false);
-  protected readonly mostrarFormularioSolicitud = signal(false);
+  protected readonly aniosDisponibles: number[] = [
+    2026,
+    2027,
+    2028,
+    2029,
+    2030
+  ];
 
   protected readonly dias: Dia[] = [
     'Lunes',
@@ -154,6 +165,21 @@ export class HorariosInstitucionales {
     'Viernes',
     'Sábado'
   ];
+
+  protected readonly horarios = signal<Horario[]>([]);
+  protected readonly solicitudes = signal<SolicitudCambio[]>([]);
+  protected readonly historial = signal<Movimiento[]>([]);
+
+  protected readonly espacioSeleccionado = signal<Espacio | null>(null);
+
+  protected readonly vistaActiva = signal<
+    'horarios' | 'solicitudes' | 'historial'
+  >('horarios');
+
+  protected readonly mostrarFormularioHorario = signal(false);
+  protected readonly mostrarFormularioSolicitud = signal(false);
+
+  protected readonly horarioSeleccionado = signal<Horario | null>(null);
 
   protected readonly horariosDelEspacio = computed(() => {
     const espacio = this.espacioSeleccionado();
@@ -224,7 +250,6 @@ export class HorariosInstitucionales {
     ).length;
   };
 
-  // Datos del formulario de horario
   protected nuevoHorario = {
     asignatura: '',
     grupo: '',
@@ -232,10 +257,10 @@ export class HorariosInstitucionales {
     dia: 'Lunes' as Dia,
     horaInicio: '',
     horaFin: '',
-    periodo: ''
+    ciclo: 'II' as CicloAcademico,
+    anio: 2026
   };
 
-  // Datos del formulario de solicitud
   protected solicitudCambio = {
     horarioId: 0,
     docente: '',
@@ -245,22 +270,101 @@ export class HorariosInstitucionales {
     motivo: ''
   };
 
-  protected readonly horarioSeleccionado = signal<Horario | null>(null);
+  protected mensajeValidacion = signal('');
+  protected tipoMensaje = signal<'error' | 'exito'>('error');
+
+  constructor() {
+    this.cargarDatos();
+
+    effect(() => {
+      if (typeof localStorage === 'undefined') {
+        return;
+      }
+
+      const datos = {
+        horarios: this.horarios(),
+        solicitudes: this.solicitudes(),
+        historial: this.historial()
+      };
+
+      localStorage.setItem(this.storageKey, JSON.stringify(datos));
+    });
+  }
+
+  private cargarDatos(): void {
+    if (typeof localStorage === 'undefined') {
+      return;
+    }
+
+    try {
+      const guardado = localStorage.getItem(this.storageKey);
+
+      if (!guardado) {
+        return;
+      }
+
+      const datos = JSON.parse(guardado);
+
+      if (Array.isArray(datos.horarios)) {
+        this.horarios.set(
+          datos.horarios.map((horario: any) => ({
+            ...horario,
+            espacioId: Number(horario.espacioId),
+            ciclo: horario.ciclo
+              ? String(horario.ciclo).toUpperCase()
+              : this.obtenerCicloAnterior(horario.periodo),
+            anio: horario.anio != null
+              ? Number(horario.anio)
+              : this.obtenerAnioAnterior(horario.periodo)
+          }))
+        );
+      }
+
+      if (Array.isArray(datos.solicitudes)) {
+        this.solicitudes.set(datos.solicitudes);
+      }
+
+      if (Array.isArray(datos.historial)) {
+        this.historial.set(datos.historial);
+      }
+
+    } catch {
+      this.mostrarMensaje(
+        'No fue posible recuperar los horarios guardados.',
+        'error'
+      );
+    }
+  }
+
+  private obtenerCicloAnterior(periodo: string): CicloAcademico {
+    const coincidencia = periodo?.match(/IV|III|II|I/i);
+
+    return (coincidencia?.[0]?.toUpperCase() as CicloAcademico) ?? 'II';
+  }
+
+  private obtenerAnioAnterior(periodo: string): number {
+    const coincidencia = periodo?.match(/20\d{2}/);
+
+    return coincidencia ? Number(coincidencia[0]) : 2026;
+  }
 
   abrirEspacio(espacio: Espacio): void {
     this.espacioSeleccionado.set(espacio);
     this.vistaActiva.set('horarios');
     this.cerrarFormularios();
+    this.limpiarMensaje();
   }
 
   volverAlCatalogo(): void {
     this.espacioSeleccionado.set(null);
     this.cerrarFormularios();
+    this.limpiarMensaje();
   }
 
   cambiarVista(vista: 'horarios' | 'solicitudes' | 'historial'): void {
     this.vistaActiva.set(vista);
     this.cerrarFormularios();
+    this.limpiarMensaje();
   }
 
   abrirFormularioHorario(): void {
@@ -271,14 +375,17 @@ export class HorariosInstitucionales {
       dia: 'Lunes',
       horaInicio: '',
       horaFin: '',
-      periodo: ''
+      ciclo: 'II',
+      anio: 2026
     };
 
+    this.limpiarMensaje();
     this.mostrarFormularioHorario.set(true);
   }
 
   cerrarFormularioHorario(): void {
     this.mostrarFormularioHorario.set(false);
+    this.limpiarMensaje();
   }
 
   registrarHorario(event: Event): void {
@@ -286,43 +393,105 @@ export class HorariosInstitucionales {
 
     const espacio = this.espacioSeleccionado();
 
-    if (
-      !espacio ||
-      !this.nuevoHorario.asignatura.trim() ||
-      !this.nuevoHorario.docente.trim() ||
-      !this.nuevoHorario.horaInicio ||
-      !this.nuevoHorario.horaFin ||
-      !this.nuevoHorario.periodo.trim()
-    ) {
+    if (!espacio) {
       return;
     }
 
-    if (this.nuevoHorario.horaInicio >= this.nuevoHorario.horaFin) {
+    const datos = this.nuevoHorario;
+
+    if (
+      !datos.asignatura.trim() ||
+      !datos.docente.trim() ||
+      !datos.horaInicio ||
+      !datos.horaFin
+    ) {
+      this.mostrarMensaje(
+        'Completá los campos obligatorios antes de continuar.',
+        'error'
+      );
+      return;
+    }
+
+    if (!this.validarRangoHorario(datos.horaInicio, datos.horaFin)) {
+      this.mostrarMensaje(
+        'La hora de inicio debe ser anterior a la hora de finalización.',
+        'error'
+      );
+      return;
+    }
+
+    const validacionInstitucional = this.validarHorarioInstitucional(
+      datos.horaInicio,
+      datos.horaFin
+    );
+
+    if (!validacionInstitucional.valido) {
+      this.mostrarMensaje(validacionInstitucional.mensaje, 'error');
+      return;
+    }
+
+    const conflicto = this.existeConflicto(
+      espacio.id,
+      datos.dia,
+      datos.horaInicio,
+      datos.horaFin,
+      datos.ciclo,
+      Number(datos.anio)
+    );
+
+    if (conflicto) {
+      this.mostrarMensaje(
+        `¡CHOQUE DE HORARIOS DETECTADO!
+
+El horario que intentás registrar coincide con otro horario existente.
+
+HORARIO QUE GENERA EL CONFLICTO:
+Asignatura: ${conflicto.asignatura}
+Grupo: ${conflicto.grupo || 'No especificado'}
+Docente: ${conflicto.docente}
+Día: ${conflicto.dia}
+Hora: ${conflicto.horaInicio} - ${conflicto.horaFin}
+Período: Ciclo ${conflicto.ciclo} - ${conflicto.anio}
+
+HORARIO QUE INTENTÁS REGISTRAR:
+Asignatura: ${datos.asignatura}
+Grupo: ${datos.grupo || 'No especificado'}
+Docente: ${datos.docente}
+Día: ${datos.dia}
+Hora: ${datos.horaInicio} - ${datos.horaFin}
+Período: Ciclo ${datos.ciclo} - ${datos.anio}
+
+No es posible registrar este horario.`,
+        'error'
+      );
+
       return;
     }
 
     const nuevo: Horario = {
       id: Date.now(),
       espacioId: espacio.id,
-      asignatura: this.nuevoHorario.asignatura.trim(),
-      grupo: this.nuevoHorario.grupo.trim(),
-      docente: this.nuevoHorario.docente.trim(),
-      dia: this.nuevoHorario.dia,
-      horaInicio: this.nuevoHorario.horaInicio,
-      horaFin: this.nuevoHorario.horaFin,
-      periodo: this.nuevoHorario.periodo.trim()
+      asignatura: datos.asignatura.trim(),
+      grupo: datos.grupo.trim(),
+      docente: datos.docente.trim(),
+      dia: datos.dia,
+      horaInicio: datos.horaInicio,
+      horaFin: datos.horaFin,
+      ciclo: datos.ciclo,
+      anio: Number(datos.anio)
     };
 
     this.horarios.update(lista => [...lista, nuevo]);
 
     this.agregarMovimiento(
       espacio.id,
-      'Horario registrado',
-      `Se registró el horario de ${nuevo.asignatura}.`,
+      'Horario institucional registrado',
+      `Se registró ${nuevo.asignatura}, grupo ${nuevo.grupo || 'no especificado'}, correspondiente al Ciclo ${nuevo.ciclo} - ${nuevo.anio}.`,
       espacio.encargado
     );
 
-    this.cerrarFormularioHorario();
+    this.mostrarMensaje('El horario se registró correctamente.', 'exito');
+    this.mostrarFormularioHorario.set(false);
   }
 
   abrirFormularioSolicitud(horario: Horario): void {
@@ -337,12 +506,14 @@ export class HorariosInstitucionales {
       motivo: ''
     };
 
+    this.limpiarMensaje();
     this.mostrarFormularioSolicitud.set(true);
   }
 
   cerrarFormularioSolicitud(): void {
     this.mostrarFormularioSolicitud.set(false);
     this.horarioSeleccionado.set(null);
+    this.limpiarMensaje();
   }
 
   registrarSolicitud(event: Event): void {
@@ -361,9 +532,33 @@ export class HorariosInstitucionales {
       !datos.docente.trim() ||
       !datos.horaInicioSolicitada ||
       !datos.horaFinSolicitada ||
-      !datos.motivo.trim() ||
-      datos.horaInicioSolicitada >= datos.horaFinSolicitada
+      !datos.motivo.trim()
     ) {
+      this.mostrarMensaje(
+        'Completá todos los campos obligatorios.',
+        'error'
+      );
+      return;
+    }
+
+    if (!this.validarRangoHorario(
+      datos.horaInicioSolicitada,
+      datos.horaFinSolicitada
+    )) {
+      this.mostrarMensaje(
+        'La hora de inicio debe ser anterior a la hora de finalización.',
+        'error'
+      );
+      return;
+    }
+
+    const validacionInstitucional = this.validarHorarioInstitucional(
+      datos.horaInicioSolicitada,
+      datos.horaFinSolicitada
+    );
+
+    if (!validacionInstitucional.valido) {
+      this.mostrarMensaje(validacionInstitucional.mensaje, 'error');
       return;
     }
 
@@ -392,8 +587,14 @@ export class HorariosInstitucionales {
       'Sistema'
     );
 
-    this.cerrarFormularioSolicitud();
+    this.mostrarFormularioSolicitud.set(false);
+    this.horarioSeleccionado.set(null);
     this.vistaActiva.set('solicitudes');
+
+    this.mostrarMensaje(
+      'La solicitud quedó pendiente de revisión.',
+      'exito'
+    );
   }
 
   aprobarSolicitud(solicitud: SolicitudCambio): void {
@@ -406,6 +607,51 @@ export class HorariosInstitucionales {
     );
 
     if (!espacio || !horario || solicitud.estado !== 'Pendiente de revisión') {
+      return;
+    }
+
+    const validacionInstitucional = this.validarHorarioInstitucional(
+      solicitud.horaInicioSolicitada,
+      solicitud.horaFinSolicitada
+    );
+
+    if (!validacionInstitucional.valido) {
+      this.mostrarMensaje(validacionInstitucional.mensaje, 'error');
+      return;
+    }
+
+    const conflicto = this.existeConflicto(
+      horario.espacioId,
+      solicitud.diaSolicitado,
+      solicitud.horaInicioSolicitada,
+      solicitud.horaFinSolicitada,
+      horario.ciclo,
+      horario.anio,
+      horario.id
+    );
+
+    if (conflicto) {
+      this.mostrarMensaje(
+        `¡CHOQUE DE HORARIOS DETECTADO!
+
+No se puede aprobar la modificación porque coincide con otro horario existente.
+
+HORARIO QUE GENERA EL CONFLICTO:
+Asignatura: ${conflicto.asignatura}
+Grupo: ${conflicto.grupo || 'No especificado'}
+Docente: ${conflicto.docente}
+Día: ${conflicto.dia}
+Hora: ${conflicto.horaInicio} - ${conflicto.horaFin}
+Período: Ciclo ${conflicto.ciclo} - ${conflicto.anio}
+
+HORARIO SOLICITADO:
+Día: ${solicitud.diaSolicitado}
+Hora: ${solicitud.horaInicioSolicitada} - ${solicitud.horaFinSolicitada}
+
+La modificación no puede aprobarse.`,
+        'error'
+      );
+
       return;
     }
 
@@ -426,9 +672,14 @@ export class HorariosInstitucionales {
 
     this.agregarMovimiento(
       espacio.id,
-      'Modificación aprobada',
+      'Modificación de horario aprobada',
       `Se actualizó el horario de ${horario.asignatura} según la solicitud del docente ${solicitud.docente}.`,
       espacio.encargado
+    );
+
+    this.mostrarMensaje(
+      'La modificación fue aprobada correctamente.',
+      'exito'
     );
   }
 
@@ -445,10 +696,96 @@ export class HorariosInstitucionales {
 
     this.agregarMovimiento(
       espacio.id,
-      'Modificación rechazada',
-      `Se rechazó la solicitud de modificación del docente ${solicitud.docente}.`,
+      'Modificación de horario rechazada',
+      `Se rechazó la solicitud de modificación del docente ${solicitud.docente}. Motivo presentado: ${solicitud.motivo}.`,
       espacio.encargado
     );
+
+    this.mostrarMensaje('La solicitud fue rechazada.', 'exito');
+  }
+
+  private existeConflicto(
+    espacioId: number,
+    dia: Dia,
+    horaInicio: string,
+    horaFin: string,
+    ciclo: CicloAcademico,
+    anio: number,
+    excluirHorarioId?: number
+  ): Horario | undefined {
+
+    const convertirAMinutos = (hora: string): number => {
+      const [horas, minutos] = hora.split(':').map(Number);
+      return horas * 60 + minutos;
+    };
+
+    const inicioNuevo = convertirAMinutos(horaInicio);
+    const finNuevo = convertirAMinutos(horaFin);
+
+    return this.horarios().find(horario => {
+      const mismoEspacio =
+        Number(horario.espacioId) === Number(espacioId);
+
+      const mismoDia = horario.dia === dia;
+
+      const mismoCiclo =
+        String(horario.ciclo).trim().toUpperCase() ===
+        String(ciclo).trim().toUpperCase();
+
+      const mismoAnio =
+        Number(horario.anio) === Number(anio);
+
+      const mismoHorario =
+        horario.id !== excluirHorarioId;
+
+      if (
+        !mismoEspacio ||
+        !mismoDia ||
+        !mismoCiclo ||
+        !mismoAnio ||
+        !mismoHorario
+      ) {
+        return false;
+      }
+
+      const inicioExistente = convertirAMinutos(horario.horaInicio);
+      const finExistente = convertirAMinutos(horario.horaFin);
+
+      return (
+        inicioNuevo < finExistente &&
+        finNuevo > inicioExistente
+      );
+    });
+  }
+
+  private validarRangoHorario(
+    horaInicio: string,
+    horaFin: string
+  ): boolean {
+    return horaInicio < horaFin;
+  }
+
+  private validarHorarioInstitucional(
+    horaInicio: string,
+    horaFin: string
+  ): { valido: boolean; mensaje: string } {
+
+    const dentroDeManana =
+      horaInicio >= '07:00' &&
+      horaFin <= '12:00';
+
+    const dentroDeTarde =
+      horaInicio >= '13:00' &&
+      horaFin <= '16:00';
+
+    if (!dentroDeManana && !dentroDeTarde) {
+      return {
+        valido: false,
+        mensaje: 'El horario debe estar entre 07:00 y 12:00 o entre 13:00 y 16:00. No se permiten horarios durante el receso ni fuera de la jornada institucional.'
+      };
+    }
+
+    return { valido: true, mensaje: '' };
   }
 
   private actualizarEstadoSolicitud(
@@ -470,6 +807,7 @@ export class HorariosInstitucionales {
     detalle: string,
     responsable: string
   ): void {
+
     const movimiento: Movimiento = {
       id: Date.now() + Math.floor(Math.random() * 1000),
       espacioId,
@@ -492,5 +830,21 @@ export class HorariosInstitucionales {
     return this.espacios.find(
       espacio => espacio.id === espacioId
     )?.nombre ?? 'Espacio no identificado';
+  }
+
+  obtenerPeriodo(horario: Horario): string {
+    return `Ciclo ${horario.ciclo} - ${horario.anio}`;
+  }
+
+  protected mostrarMensaje(
+    mensaje: string,
+    tipo: 'error' | 'exito'
+  ): void {
+    this.mensajeValidacion.set(mensaje);
+    this.tipoMensaje.set(tipo);
+  }
+
+  protected limpiarMensaje(): void {
+    this.mensajeValidacion.set('');
   }
 }

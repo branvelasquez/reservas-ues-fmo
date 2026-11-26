@@ -5,26 +5,23 @@
     <div>
       <span class="module-eyebrow">ADMINISTRACIÓN</span>
       <h1>Espacios académicos</h1>
-      <p>
-        Consulta el inventario de laboratorios y aulas de cómputo
-        disponibles en la Facultad.
-      </p>
+      <p>Consulta y administra el inventario de laboratorios y aulas de cómputo de la Facultad.</p>
     </div>
 
     <div class="inventory-badge">
       <span class="inventory-dot"></span>
-      Inventario provisional
+      Inventario institucional
     </div>
   </div>
 
-  <!-- Resumen -->
+  <!-- RESUMEN -->
   <div class="espacios-summary">
 
     <article class="summary-card">
       <div class="summary-icon blue-icon">▣</div>
       <div>
         <span class="summary-label">Total de espacios</span>
-        <strong>{{ espacios.length }}</strong>
+        <strong>{{ espacios().length }}</strong>
         <small>Espacios identificados</small>
       </div>
     </article>
@@ -49,7 +46,7 @@
 
   </div>
 
-  <!-- Filtros -->
+  <!-- CATÁLOGO -->
   <div class="espacios-toolbar">
 
     <div class="toolbar-heading">
@@ -78,18 +75,14 @@
         <option value="Aula de cómputo">Aulas de cómputo</option>
       </select>
 
-      <button
-        type="button"
-        class="clear-filter-btn"
-        (click)="limpiarFiltros()"
-      >
+      <button type="button" class="clear-filter-btn" (click)="limpiarFiltros()">
         Limpiar
       </button>
 
     </div>
   </div>
 
-  <!-- Tarjetas -->
+  <!-- TARJETAS -->
   <div class="espacios-grid">
 
     @for (espacio of espaciosFiltrados(); track espacio.id) {
@@ -133,6 +126,75 @@
             </div>
           </div>
 
+          <div class="detail-row">
+            <span class="detail-icon">♧</span>
+            <div>
+              <small>Capacidad máxima</small>
+              <strong>
+                {{ espacio.capacidad !== null
+                  ? espacio.capacidad + ' personas'
+                  : 'Pendiente de confirmar' }}
+              </strong>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="space-operational-status">
+          <small>Estado operativo</small>
+          <span
+            class="operational-badge"
+            [class.status-available]="espacio.estadoOperativo === 'Disponible'"
+            [class.status-maintenance]="espacio.estadoOperativo === 'En mantenimiento'"
+            [class.status-out]="espacio.estadoOperativo === 'Fuera de servicio'"
+            [class.status-pending]="espacio.estadoOperativo === 'Pendiente de confirmar'"
+          >
+            <span class="status-dot"></span>
+            {{ espacio.estadoOperativo }}
+          </span>
+        </div>
+
+        <div class="space-extra-info">
+          <div class="extra-info-heading">
+            <strong>Equipamiento</strong>
+            <span>{{ espacio.equipos.length }} registros</span>
+          </div>
+
+          @if (espacio.equipos.length > 0) {
+            <div class="equipment-list">
+              @for (equipo of espacio.equipos; track equipo.id) {
+                <div class="equipment-item">
+                  <div>
+                    <strong>{{ equipo.nombre }}</strong>
+                    <small>Cantidad: {{ equipo.cantidad }}</small>
+                  </div>
+                  <span>{{ equipo.estado }}</span>
+                </div>
+              }
+            </div>
+          } @else {
+            <p class="pending-information">Inventario de equipos pendiente de confirmar.</p>
+          }
+        </div>
+
+        <div class="space-extra-info">
+          <div class="extra-info-heading">
+            <strong>Incidencias</strong>
+            <span>{{ espacio.incidencias.length }} registradas</span>
+          </div>
+
+          @if (espacio.incidencias.length > 0) {
+            <div class="incident-list">
+              @for (incidencia of espacio.incidencias; track incidencia.id) {
+                <div class="incident-item">
+                  <strong>{{ incidencia.descripcion }}</strong>
+                  <small>{{ incidencia.fecha }} · {{ incidencia.estado }}</small>
+                </div>
+              }
+            </div>
+          } @else {
+            <p class="pending-information">No hay incidencias registradas.</p>
+          }
         </div>
 
         <div class="espacio-card-footer">
@@ -140,6 +202,15 @@
             <span></span>
             {{ espacio.estado }}
           </span>
+
+          <button
+            type="button"
+            class="manage-space-btn"
+            (click)="abrirEdicion(espacio)"
+          >
+            Gestionar espacio
+            <span>→</span>
+          </button>
         </div>
 
       </article>
@@ -149,27 +220,341 @@
       <div class="empty-spaces">
         <div class="empty-icon">⌕</div>
         <h3>No se encontraron espacios</h3>
-        <p>
-          No hay resultados que coincidan con tu búsqueda o filtro.
-        </p>
-        <button type="button" (click)="limpiarFiltros()">
-          Limpiar filtros
-        </button>
+        <p>No hay resultados que coincidan con tu búsqueda o filtro.</p>
+        <button type="button" (click)="limpiarFiltros()">Limpiar filtros</button>
       </div>
 
     }
 
   </div>
 
-  <!-- Nota informativa -->
+  <!-- VENTANA DE GESTIÓN -->
+  @if (mostrarFormulario() && espacioSeleccionado(); as espacio) {
+
+    <div class="management-overlay" (click)="cerrarEdicion()">
+
+      <section
+        class="management-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="management-title"
+        (click)="$event.stopPropagation()"
+      >
+
+        <div class="management-header">
+          <div>
+            <span class="module-eyebrow">GESTIÓN INSTITUCIONAL</span>
+            <h2 id="management-title">Administrar espacio</h2>
+            <p>{{ espacio.nombre }} · ESP-{{ espacio.id.toString().padStart(3, '0') }}</p>
+          </div>
+
+          <button
+            type="button"
+            class="modal-close-btn"
+            aria-label="Cerrar"
+            (click)="cerrarEdicion()"
+          >×</button>
+        </div>
+
+        <!-- DATOS GENERALES -->
+        <div class="management-section">
+          <div class="management-section-heading">
+            <span class="section-number">01</span>
+            <div>
+              <h3>Información general</h3>
+              <p>Actualiza los datos de identificación del espacio.</p>
+            </div>
+          </div>
+
+          <div class="management-form-grid">
+
+            <label class="management-field full-field">
+              <span>Nombre del espacio</span>
+              <input
+                type="text"
+                [value]="formulario().nombre"
+                (input)="actualizarCampo('nombre', $any($event.target).value)"
+                placeholder="Nombre del espacio"
+                required
+              />
+            </label>
+
+            <label class="management-field">
+              <span>Ubicación</span>
+              <input
+                type="text"
+                [value]="formulario().ubicacion"
+                (input)="actualizarCampo('ubicacion', $any($event.target).value)"
+                placeholder="Departamento o edificio"
+                required
+              />
+            </label>
+
+            <label class="management-field">
+              <span>Responsable / encargado</span>
+              <input
+                type="text"
+                [value]="formulario().encargado"
+                (input)="actualizarCampo('encargado', $any($event.target).value)"
+                placeholder="Nombre del responsable"
+              />
+            </label>
+
+            <label class="management-field">
+              <span>Capacidad máxima</span>
+              <input
+                type="number"
+                min="1"
+                step="1"
+                [value]="formulario().capacidad ?? ''"
+                (input)="actualizarCampo('capacidad', $any($event.target).value === '' ? null : Number($any($event.target).value))"
+                placeholder="Cantidad de personas"
+              />
+            </label>
+
+            <label class="management-field">
+              <span>Estado operativo</span>
+              <select
+                [value]="formulario().estadoOperativo"
+                (change)="actualizarCampo('estadoOperativo', $any($event.target).value)"
+              >
+                <option value="Pendiente de confirmar">Pendiente de confirmar</option>
+                <option value="Disponible">Disponible</option>
+                <option value="En mantenimiento">En mantenimiento</option>
+                <option value="Fuera de servicio">Fuera de servicio</option>
+              </select>
+            </label>
+
+          </div>
+
+          <div class="management-actions">
+            <button type="button" class="save-space-btn" (click)="guardarEspacio()">
+              Guardar información general
+            </button>
+          </div>
+        </div>
+
+        <!-- EQUIPAMIENTO -->
+        <div class="management-section">
+          <div class="management-section-heading">
+            <span class="section-number">02</span>
+            <div>
+              <h3>Equipamiento</h3>
+              <p>Registra los recursos disponibles en este espacio.</p>
+            </div>
+          </div>
+
+          @if (espacio.equipos.length > 0) {
+            <div class="management-record-list">
+              @for (equipo of espacio.equipos; track equipo.id) {
+                <div class="management-record">
+                  <div>
+                    <strong>{{ equipo.nombre }}</strong>
+                    <small>
+                      {{ equipo.cantidad }} unidades · {{ equipo.estado }}
+                    </small>
+                    @if (equipo.observaciones) {
+                      <small>{{ equipo.observaciones }}</small>
+                    }
+                  </div>
+
+                  <button
+                    type="button"
+                    class="delete-record-btn"
+                    (click)="eliminarEquipo(equipo.id)"
+                  >
+                    Eliminar
+                  </button>
+                </div>
+              }
+            </div>
+          } @else {
+            <p class="pending-information">Todavía no hay equipos registrados.</p>
+          }
+
+          @if (!nuevoEquipo()) {
+            <button type="button" class="add-record-btn" (click)="abrirNuevoEquipo()">
+              + Agregar equipo
+            </button>
+          } @else {
+
+            <div class="inline-management-form">
+
+              <label class="management-field full-field">
+                <span>Nombre del equipo</span>
+                <input
+                  type="text"
+                  [value]="equipoFormulario().nombre"
+                  (input)="actualizarEquipoCampo('nombre', $any($event.target).value)"
+                  placeholder="Ej. Computadora, proyector..."
+                />
+              </label>
+
+              <label class="management-field">
+                <span>Cantidad</span>
+                <input
+                  type="number"
+                  min="1"
+                  step="1"
+                  [value]="equipoFormulario().cantidad"
+                  (input)="actualizarEquipoCampo('cantidad', Number($any($event.target).value))"
+                />
+              </label>
+
+              <label class="management-field">
+                <span>Estado</span>
+                <select
+                  [value]="equipoFormulario().estado"
+                  (change)="actualizarEquipoCampo('estado', $any($event.target).value)"
+                >
+                  <option value="Disponible">Disponible</option>
+                  <option value="Dañado">Dañado</option>
+                  <option value="Fuera de servicio">Fuera de servicio</option>
+                </select>
+              </label>
+
+              <label class="management-field full-field">
+                <span>Observaciones</span>
+                <input
+                  type="text"
+                  [value]="equipoFormulario().observaciones"
+                  (input)="actualizarEquipoCampo('observaciones', $any($event.target).value)"
+                  placeholder="Observaciones opcionales"
+                />
+              </label>
+
+              <div class="management-actions">
+                <button type="button" class="save-space-btn" (click)="guardarEquipo()">
+                  Guardar equipo
+                </button>
+                <button type="button" class="cancel-record-btn" (click)="nuevoEquipo.set(false)">
+                  Cancelar
+                </button>
+              </div>
+
+            </div>
+          }
+        </div>
+
+        <!-- INCIDENCIAS -->
+        <div class="management-section">
+          <div class="management-section-heading">
+            <span class="section-number">03</span>
+            <div>
+              <h3>Incidencias y mantenimiento</h3>
+              <p>Registra problemas y actualiza su seguimiento.</p>
+            </div>
+          </div>
+
+          @if (espacio.incidencias.length > 0) {
+            <div class="management-record-list">
+              @for (incidencia of espacio.incidencias; track incidencia.id) {
+                <div class="management-record">
+                  <div>
+                    <strong>{{ incidencia.descripcion }}</strong>
+                    <small>{{ incidencia.fecha }}</small>
+                  </div>
+
+                  <select
+                    [value]="incidencia.estado"
+                    (change)="actualizarEstadoIncidencia(incidencia.id, $any($event.target).value)"
+                  >
+                    <option value="Pendiente">Pendiente</option>
+                    <option value="En atención">En atención</option>
+                    <option value="Resuelta">Resuelta</option>
+                  </select>
+                </div>
+              }
+            </div>
+          } @else {
+            <p class="pending-information">No hay incidencias registradas.</p>
+          }
+
+          @if (!nuevaIncidencia()) {
+            <button
+              type="button"
+              class="add-record-btn"
+              (click)="abrirNuevaIncidencia()"
+            >
+              + Registrar incidencia
+            </button>
+          } @else {
+
+            <div class="inline-management-form">
+
+              <label class="management-field full-field">
+                <span>Descripción de la incidencia</span>
+                <input
+                  type="text"
+                  [value]="incidenciaFormulario().descripcion"
+                  (input)="actualizarIncidenciaCampo('descripcion', $any($event.target).value)"
+                  placeholder="Describe el problema"
+                />
+              </label>
+
+              <label class="management-field">
+                <span>Fecha</span>
+                <input
+                  type="date"
+                  [value]="incidenciaFormulario().fecha"
+                  (input)="actualizarIncidenciaCampo('fecha', $any($event.target).value)"
+                />
+              </label>
+
+              <label class="management-field">
+                <span>Estado</span>
+                <select
+                  [value]="incidenciaFormulario().estado"
+                  (change)="actualizarIncidenciaCampo('estado', $any($event.target).value)"
+                >
+                  <option value="Pendiente">Pendiente</option>
+                  <option value="En atención">En atención</option>
+                  <option value="Resuelta">Resuelta</option>
+                </select>
+              </label>
+
+              <div class="management-actions">
+                <button
+                  type="button"
+                  class="save-space-btn"
+                  (click)="guardarIncidencia()"
+                >
+                  Guardar incidencia
+                </button>
+                <button
+                  type="button"
+                  class="cancel-record-btn"
+                  (click)="nuevaIncidencia.set(false)"
+                >
+                  Cancelar
+                </button>
+              </div>
+
+            </div>
+          }
+        </div>
+
+        <div class="management-footer">
+          <span>Los cambios se guardan en este navegador.</span>
+          <button type="button" class="cancel-record-btn" (click)="cerrarEdicion()">
+            Cerrar
+          </button>
+        </div>
+
+      </section>
+
+    </div>
+  }
+
+  <!-- NOTA -->
   <div class="inventory-note">
     <div class="note-icon">i</div>
     <div>
-      <strong>Información pendiente de validación</strong>
+      <strong>Información del inventario</strong>
       <p>
-        Este catálogo representa el inventario preliminar identificado
-        para el sistema. Las ubicaciones y asignaciones de responsables
-        que aún no han sido confirmadas se muestran como pendientes.
+        Los datos de capacidad, equipamiento y estado operativo deben
+        validarse con los responsables de cada espacio. Los cambios
+        realizados actualmente se almacenan localmente en este navegador.
       </p>
     </div>
   </div>

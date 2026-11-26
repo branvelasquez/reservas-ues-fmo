@@ -1029,3 +1029,35 @@ button:focus-visible {
     width: 100%;
   }
 }
+.validation-message {
+  padding: 16px 18px;
+  margin: 16px 0;
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+  white-space: pre-line;
+}
+
+.validation-message.error {
+  background: #fff1f0;
+  border-color: #e6a09a;
+  color: #9f2525;
+}
+
+.validation-message.success {
+  background: #edf8f0;
+  border-color: #9bc9a6;
+  color: #216b35;
+}
+
+.validation-message strong {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.validation-message p {
+  margin: 0;
+  line-height: 1.7;
+  font-size: 13px;
+  white-space: pre-line;
+}

@@ -1,24 +1,47 @@
 
 :host {
   display: block;
+  position: relative;
+  width: 100%;
+  max-width: 100%;
   min-height: 100vh;
-}
-
-.login-container {
-  min-height: 100vh;
-  display: grid;
-  grid-template-columns: 1.05fr 0.95fr;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
   background: var(--background-color, #f5f7fb);
 }
 
-/* PANEL INSTITUCIONAL */
+/* ==========================================
+   CONTENEDOR PRINCIPAL
+========================================== */
+
+.login-container {
+  position: relative;
+  width: 100%;
+  max-width: none;
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  background: var(--background-color, #f5f7fb);
+}
+
+/* ==========================================
+   PANEL INSTITUCIONAL
+========================================== */
 
 .brand-section {
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
+  min-width: 0;
   padding: 70px 9%;
+  box-sizing: border-box;
   overflow: hidden;
   color: #ffffff;
   background:
@@ -55,6 +78,7 @@
 .brand-content {
   position: relative;
   z-index: 1;
+  width: 100%;
   max-width: 540px;
 }
 
@@ -118,6 +142,7 @@
 
 .project-tags {
   display: flex;
+  flex-wrap: wrap;
   gap: 10px;
   margin-top: 35px;
 }
@@ -142,38 +167,44 @@
   letter-spacing: 0.5px;
 }
 
-/* FORMULARIO */
+/* ==========================================
+   FORMULARIO
+========================================== */
 
 .form-section {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 55px 9%;
+  min-width: 0;
+  min-height: 100vh;
+  padding: 55px 8%;
+  box-sizing: border-box;
   background: var(--background-color, #f5f7fb);
+  transition: background 0.25s ease;
 }
 
 .form-wrapper {
   width: 100%;
-  max-width: 420px;
+  max-width: 500px;
 }
 
 .form-heading {
-  margin-bottom: 35px;
+  margin-bottom: 38px;
 }
 
 .form-eyebrow {
   display: inline-block;
-  margin-bottom: 15px;
+  margin-bottom: 17px;
   color: #b18b2e;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 800;
   letter-spacing: 1.8px;
 }
 
 .form-heading h2 {
-  margin: 0 0 10px;
+  margin: 0 0 12px;
   color: var(--text-primary, #172b46);
-  font-size: 34px;
+  font-size: 38px;
   font-weight: 750;
   letter-spacing: -1px;
 }
@@ -181,32 +212,37 @@
 .form-heading p {
   margin: 0;
   color: var(--text-secondary, #718096);
-  font-size: 14px;
+  font-size: 15px;
+  line-height: 1.6;
 }
+
+/* ==========================================
+   CAMPOS
+========================================== */
 
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: 9px;
-  margin-bottom: 22px;
+  gap: 10px;
+  margin-bottom: 25px;
 }
 
 .form-group label {
   color: var(--text-primary, #26374d);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
 }
 
 .form-group input {
   width: 100%;
-  height: 49px;
+  height: 54px;
   box-sizing: border-box;
-  padding: 0 15px;
+  padding: 0 17px;
   outline: none;
   border: 1px solid var(--border-color, #dce2ea);
-  border-radius: 8px;
+  border-radius: 9px;
   color: var(--text-primary, #172b46);
-  font-size: 13px;
+  font-size: 14px;
   background: var(--surface-color, #ffffff);
   transition: border-color 0.2s, box-shadow 0.2s;
 }
@@ -220,6 +256,10 @@
   box-shadow: 0 0 0 3px rgba(36, 91, 145, 0.10);
 }
 
+/* ==========================================
+   CONTRASEÑA
+========================================== */
+
 .password-wrapper {
   position: relative;
   display: flex;
@@ -227,15 +267,15 @@
 }
 
 .password-wrapper input {
-  padding-right: 85px;
+  padding-right: 90px;
 }
 
 .password-toggle {
   position: absolute;
-  right: 13px;
+  right: 15px;
   border: none;
   color: #245b91;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
   background: transparent;
   cursor: pointer;
@@ -245,18 +285,22 @@
   color: #b18b2e;
 }
 
+/* ==========================================
+   RECUPERAR CONTRASEÑA
+========================================== */
+
 .forgot-password {
   display: flex;
   justify-content: flex-end;
   margin-top: -10px;
-  margin-bottom: 23px;
+  margin-bottom: 25px;
 }
 
 .forgot-password button {
   padding: 0;
   border: none;
   color: #245b91;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
   background: transparent;
   cursor: pointer;
@@ -267,16 +311,18 @@
   text-decoration: underline;
 }
 
-/* BOTONES */
+/* ==========================================
+   BOTÓN DE INICIO
+========================================== */
 
 .login-button {
   width: 100%;
-  height: 49px;
+  height: 54px;
   border: none;
-  border-radius: 8px;
+  border-radius: 9px;
   color: #ffffff;
-  font-size: 14px;
-  font-weight: 700;
+  font-size: 15px;
+  font-weight: 750;
   background: linear-gradient(110deg, #173e69, #245b91);
   box-shadow: 0 5px 14px rgba(23, 62, 105, 0.16);
   cursor: pointer;
@@ -288,37 +334,41 @@
   box-shadow: 0 8px 18px rgba(23, 62, 105, 0.23);
 }
 
-/* MENSAJES */
+/* ==========================================
+   MENSAJES
+========================================== */
 
 .form-message {
   margin-top: 18px;
-  padding: 13px;
+  padding: 14px;
   border: 1px solid #d9e5f3;
   border-radius: 8px;
   color: #245b91;
-  font-size: 12px;
+  font-size: 13px;
   line-height: 1.5;
   background: #edf4fb;
 }
 
-/* SOLICITUD DE ACCESO */
+/* ==========================================
+   SOLICITUD DE ACCESO
+========================================== */
 
 .access-section {
-  margin-top: 30px;
+  margin-top: 32px;
   text-align: center;
 }
 
 .access-section p {
-  margin: 0 0 9px;
+  margin: 0 0 10px;
   color: var(--text-secondary, #718096);
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .access-button {
   padding: 0;
   border: none;
   color: #245b91;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 750;
   background: transparent;
   cursor: pointer;
@@ -329,32 +379,34 @@
   text-decoration: underline;
 }
 
-/* DEMOSTRACIÓN */
+/* ==========================================
+   DEMOSTRACIÓN
+========================================== */
 
 .demo-section {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
-  margin-top: 27px;
-  padding: 20px 0;
+  gap: 13px;
+  margin-top: 29px;
+  padding: 22px 0;
   border-top: 1px solid var(--border-color, #e1e6ed);
   border-bottom: 1px solid var(--border-color, #e1e6ed);
 }
 
 .demo-label {
   color: var(--text-secondary, #8793a2);
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 800;
   letter-spacing: 1.5px;
 }
 
 .demo-button {
-  padding: 10px 17px;
+  padding: 11px 19px;
   border: 1px solid var(--border-color, #dce2ea);
   border-radius: 7px;
   color: var(--text-primary, #34445a);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 650;
   background: var(--surface-color, #ffffff);
   cursor: pointer;
@@ -366,19 +418,100 @@
   color: #245b91;
 }
 
-/* PIE */
+/* ==========================================
+   PIE
+========================================== */
 
 .form-footer {
   display: flex;
   flex-direction: column;
   gap: 5px;
-  margin-top: 25px;
+  margin-top: 27px;
   color: var(--text-secondary, #8a95a3);
-  font-size: 10px;
+  font-size: 11px;
   text-align: center;
 }
 
-/* RESPONSIVE */
+/* ==========================================
+   MODO OSCURO
+========================================== */
+
+:host-context(.dark-theme) {
+  --background-color: #0b1d33;
+  --surface-color: #142f50;
+  --text-primary: #f4f7fb;
+  --text-secondary: #b9c9da;
+  --border-color: rgba(180, 204, 229, 0.20);
+}
+
+:host-context(.dark-theme) .form-section {
+  background: #0b1d33;
+}
+
+:host-context(.dark-theme) .form-heading h2,
+:host-context(.dark-theme) .form-group label {
+  color: #ffffff;
+}
+
+:host-context(.dark-theme) .form-heading p,
+:host-context(.dark-theme) .access-section p,
+:host-context(.dark-theme) .form-footer {
+  color: #b9c9da;
+}
+
+:host-context(.dark-theme) .form-group input {
+  background: #142f50;
+  border-color: rgba(180, 204, 229, 0.22);
+  color: #ffffff;
+}
+
+:host-context(.dark-theme) .form-group input::placeholder {
+  color: #a8b9cc;
+}
+
+:host-context(.dark-theme) .demo-button {
+  background: #142f50;
+  border-color: rgba(180, 204, 229, 0.22);
+  color: #ffffff;
+}
+
+:host-context(.dark-theme) .demo-section {
+  border-color: rgba(180, 204, 229, 0.20);
+}
+
+:host-context(.dark-theme) .demo-label {
+  color: #b9c9da;
+}
+
+:host-context(.dark-theme) .form-message {
+  background: rgba(36, 91, 145, 0.22);
+  border-color: rgba(180, 204, 229, 0.20);
+  color: #d8e7f7;
+}
+
+:host-context(.dark-theme) .password-toggle,
+:host-context(.dark-theme) .forgot-password button,
+:host-context(.dark-theme) .access-button {
+  color: #d7b65d;
+}
+
+/* ==========================================
+   RESPONSIVE
+========================================== */
+
+@media (max-width: 1100px) {
+  .login-container {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .form-wrapper {
+    max-width: 460px;
+  }
+
+  .form-heading h2 {
+    font-size: 34px;
+  }
+}
 
 @media (max-width: 900px) {
   .login-container {
@@ -439,10 +572,37 @@
   }
 
   .form-section {
+    min-height: auto;
     padding: 45px 8%;
   }
 
+  .form-wrapper {
+    max-width: 500px;
+  }
+
+  .form-heading {
+    margin-bottom: 30px;
+  }
+
   .form-heading h2 {
-    font-size: 29px;
+    font-size: 30px;
+  }
+}
+
+@media (max-width: 380px) {
+  .form-section {
+    padding: 35px 6%;
+  }
+
+  .form-heading h2 {
+    font-size: 27px;
+  }
+
+  .form-group input {
+    height: 50px;
+  }
+
+  .login-button {
+    height: 50px;
   }
 }
